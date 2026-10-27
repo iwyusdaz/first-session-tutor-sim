@@ -1,0 +1,48 @@
+
+ RUN  v5.0.5 /Users/iwayanusada/github-portfolio-building/repos/immersive/first-session-tutor-sim
+
+ ❯ tests/unit/model.test.js (15 tests | 1 failed) 5370ms
+   ❯ content validator (1)
+     × passes with no errors and walks every path in both mixes 5356ms
+   ✓ canonical vocabulary (3)
+     ✓ uses the seven move names from socratic-ai-tutor exactly 3ms
+     ✓ uses the five tutor-training-course domain names exactly 1ms
+     ✓ covers the five-part routine with its time boxes 0ms
+   ✓ student model rules (5)
+     ✓ telling the answer does not raise understanding; probing an engaged student does 0ms
+     ✓ wait time of 3 s or more raises the quiet student; rushing lowers her engagement 0ms
+     ✓ the error moment follows the mix: sign error by Jordan (quiet mix), distributing error by Sam (dominant mix) 0ms
+     ✓ praising effort-free ("generic praise") does not help the discouraged student 0ms
+     ✓ state always stays within 0-4 1ms
+   ✓ scoring against the observation rubric (3)
+     ✓ a strong run scores 4 on every domain; a weak run scores low 1ms
+     ✓ skipping the exit ticket caps Session structure at 1 0ms
+     ✓ rushing the wait lowers the questioning score 0ms
+   ✓ wait-time accessibility scale (1)
+     ✓ scales the 3-second target and honors a manual choice 0ms
+   ✓ cues (1)
+     ✓ maps state to distinguishable body-language cues 0ms
+   ✓ labels and honesty (1)
+     ✓ labels the model and the students as constructed 3ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/unit/model.test.js > content validator > passes with no errors and walks every path in both mixes
+Error: Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ tests/unit/model.test.js:22:3
+     20|
+     21| describe('content validator', () => {
+     22|   it('passes with no errors and walks every path in both mixes', () =>…
+       |   ^
+     23|     const r = validate(data);
+     24|     expect(r.errors).toEqual([]);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 14 passed (15)
+   Start at  23:25:19
+   Duration  6.42s (tests 94%, transform 5%, import 1%, worker 1%)
+
