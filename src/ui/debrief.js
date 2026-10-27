@@ -69,7 +69,9 @@ function scoreTable(data, score) {
 function momentDetail(app, run, entry, i) {
   const { data } = app;
   const m = data.session.moments[i];
+  const option = m.options.find((o) => o.id === entry.optionId);
   const mv = data.moves.moves.find((x) => x.id === entry.move);
+  const tag = mv.canonical ? (option?.misapplied ? ' (canonical move, misapplied)' : ' (canonical move)') : ' (not a canonical move)';
   const changes = entry.applied.flatMap((a) => a.changes);
   const changeText = changes.length
     ? changes.map((c) => `${studentName(data, c.student)} ${DIM_LABEL[c.dim].toLowerCase()} ${c.from} → ${c.to}`).join('; ')
@@ -77,13 +79,17 @@ function momentDetail(app, run, entry, i) {
   const noticed = (entry.noticed || []).map((oid) => m.observations.find((o) => o.id === oid)).filter(Boolean);
   const relevant = m.observations.filter((o) => o.relevant);
   const caught = noticed.filter((o) => o.relevant).length;
+  const f = (t) => fill(t, data, run.mix);
   return h('div', { class: 'moment-detail' },
-    h('p', {}, h('strong', { text: 'You chose: ' }), `${mv.name} → ${targetLabel(data, run.mix, entry.targetId ?? 'all')}${mv.canonical ? ' (canonical move)' : ''}.`),
+    h('p', {}, h('strong', { text: 'You chose: ' }), `${mv.name} → ${targetLabel(data, run.mix, entry.targetId ?? 'all')}${tag}.`),
     h('p', { text: `You said: ${entry.phrasing}` }),
     entry.waited === null ? null : h('p', { text: entry.waited ? `Wait time: you waited${entry.waitSeconds ? ` ${entry.waitSeconds.toFixed(1)} s` : ''}, at least the 3–5 seconds the move asks for.` : `Wait time: you spoke again${entry.waitSeconds ? ` after ${entry.waitSeconds.toFixed(1)} s` : ' right away'}, before the 3-second mark.` }),
     h('p', { text: `What changed: ${changeText}` }),
     h('ul', { class: 'rule-list', 'aria-label': 'Rules that fired' }, entry.applied.map((a) => h('li', {}, h('span', { text: a.rationale }), h('span', { class: 'source', text: ` (${a.source})` })))),
     h('p', { text: `Noticing: you marked ${noticed.length} observation(s); ${caught} of the ${relevant.length} that mattered.` }),
+    // Which cues mattered, not just how many (heuristics H8 / walkthrough CW2).
+    relevant.length ? h('ul', { class: 'cue-mattered', 'aria-label': 'Cues that mattered here' },
+      relevant.map((o) => h('li', { text: `${noticed.some((n) => n.id === o.id) ? '✓ you marked' : '✗ you missed'}: ${f(o.text)}` }))) : null,
     h('p', { class: 'coach-note' }, h('strong', { text: 'Coach note: ' }), data.notes.notes[m.id][entry.optionId]),
   );
 }
@@ -105,7 +111,7 @@ export function renderDebrief(app, container) {
   const timeline = h('ol', { class: 'timeline', 'aria-label': 'Session timeline' });
   run.log.forEach((entry, i) => {
     const m = data.session.moments[i];
-    const det = h('details', { id: `tl-${m.id}` }, h('summary', { text: `${entry.clock} · ${f(m.scene).split('. ')[0]}.` }), momentDetail(app, run, entry, i));
+    const det = h('details', { id: `tl-${m.id}` }, h('summary', { text: `${entry.clock} · ${f(m.title || m.scene).replace(/\.$/, '')}.` }), momentDetail(app, run, entry, i));
     det.addEventListener('toggle', () => { if (det.open) app.showReplayMoment(i); });
     timeline.append(h('li', {}, det));
   });
@@ -142,11 +148,21 @@ export function renderDebrief(app, container) {
   wrap.append(refl);
 
   const nextMix = run.mixId === 'quiet' ? 'dominant' : 'quiet';
+  // "Play again" replaces the finished run, so it asks first (heuristics H2 /
+  // walkthrough CW11): the first click arms the button, the second starts the run.
+  const replay = h('button', { type: 'button', text: 'Play this run again (replaces this result)' });
+  replay.addEventListener('click', () => {
+    if (replay.dataset.armed) { app.startRun(run.mixId); return; }
+    replay.dataset.armed = '1';
+    replay.textContent = 'This run\'s result will be replaced. Start over?';
+    replay.classList.add('danger');
+    replay.focus();
+  });
   const actions = h('div', { class: 'debrief-actions' },
     other?.done
       ? h('button', { type: 'button', class: 'primary', text: 'Go to the post-check', onclick: () => app.gotoModule(3) })
       : h('button', { type: 'button', class: 'primary', text: `Run the session again: ${data.mixes.mixes.find((x) => x.id === nextMix).name}`, onclick: () => app.startRun(nextMix) }),
-    h('button', { type: 'button', text: 'Replay this run from the start', onclick: () => app.startRun(run.mixId) }));
+    replay);
   wrap.append(actions);
   container.append(wrap);
 }

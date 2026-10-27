@@ -87,6 +87,22 @@ describe('student model rules', () => {
     choose(data, run, 'praise');
     expect(run.students.C.c).toBeLessThanOrEqual(c0);
   });
+  it('reviewing the ticket data targets the students who made the error, not the whole group', () => {
+    const run = createRun(data, 'quiet');
+    choose(data, run, 'greet');
+    const before = { A: run.students.A.u, B: run.students.B.u, C: run.students.C.u };
+    choose(data, run, 'data');
+    expect(run.students.A.u).toBeGreaterThan(before.A);
+    expect(run.students.C.u).toBeGreaterThan(before.C);
+    expect(run.students.B.u).toBe(before.B);
+  });
+  it('flags the hint-ladder options that skip rungs as misapplied canonical moves', () => {
+    const m3 = data.session.moments.find((m) => m.id === 'm3');
+    const m6 = data.session.moments.find((m) => m.id === 'm6');
+    expect(m3.options.find((o) => o.id === 'partial').misapplied).toBe(true);
+    expect(m6.options.find((o) => o.id === 'ladder').misapplied).toBe(true);
+    expect(m3.options.find((o) => o.id === 'probe').misapplied).toBeUndefined();
+  });
   it('state always stays within 0-4', () => {
     for (const mix of ['quiet', 'dominant']) for (const picks of [BEST, WEAK]) {
       const run = play(mix, picks);

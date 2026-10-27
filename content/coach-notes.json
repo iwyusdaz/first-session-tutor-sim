@@ -12,12 +12,12 @@
     "m2": {
       "data": "Reviewing straight from the tickets is the data loop working (S1, D3). The students whose error you named now have a reason to pay attention.",
       "vague": "'Like last time' targets nothing. The tickets already told you which error to review; using them is the whole point (Domain 5).",
-      "skip": "Skipping review saves five minutes and costs the session's target. The sign error from the ticket comes straight back."
+      "skip": "Skipping review saves five minutes and costs the session's target. The error from the ticket comes straight back."
     },
     "m3": {
       "probe": "A question at the spot where the error is, without naming it, lets the student find the fix (Q3, P3). That's the move the whole program is built on.",
       "partial": "A partial step jumps straight to ladder rung 3. The student copies it instead of finding it. Try a probing question (rung 0) first.",
-      "label": "Naming the misconception hands over the diagnosis and lands as a verdict. Name the symptom in a question instead: 'What did the 2 multiply?'",
+      "label": "Naming the misconception hands over the diagnosis and lands as a verdict. Name the symptom in a question instead — ask what happens to the number, not what the mistake is called.",
       "tell": "Telling the answer makes the line right and leaves the student's understanding where it was. They produced nothing."
     },
     "m4": {

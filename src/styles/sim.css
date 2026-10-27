@@ -85,6 +85,7 @@ button.primary { background: var(--accent-strong); border-color: var(--accent-st
 .reflection textarea { width: 100%; font: inherit; color: var(--text); background: var(--bg); border: 1px solid color-mix(in srgb, var(--muted) 45%, transparent); border-radius: 6px; padding: 0.4rem; }
 .reflection label { display: block; margin-top: 0.5rem; }
 .debrief-actions { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.8rem; }
+.debrief-actions .danger { border-color: var(--warn); color: var(--warn); font-weight: 600; }
 
 @media (max-width: 760px) {
   .side-panel { top: auto; left: 0.4rem; right: 0.4rem; bottom: 0.4rem; width: auto; max-height: 55vh; }

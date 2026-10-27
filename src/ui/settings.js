@@ -1,23 +1,26 @@
 /**
- * Settings dialog (shared template): quality preset, text size, contrast, captions,
- * reduced motion, FOV comfort, separate volume controls + mute. Slug-prefixed persistence.
+ * Settings dialog: quality preset, text size, contrast, captions, reduced motion,
+ * FOV comfort, and (since the app has no audio) no volume controls. Wait-time
+ * preferences are editable here too, so a learner mid-session doesn't have to
+ * leave to change them. Slug-prefixed persistence; applied at startup (A2).
  * @module ui/settings
  */
 import { openDialog, closeDialog } from '../a11y/focus.js';
 
 export class Settings {
-  constructor({ slug, dialog, quality, motion, onVolume, onFov }) {
+  constructor({ slug, dialog, quality, motion, onFov, wait }) {
     this.slug = slug;
     this.dialog = dialog;
     this.quality = quality;
     this.motion = motion;
-    this.onVolume = onVolume;
     this.onFov = onFov;
+    /** Optional { get: () => {scale, manual}, set: (p) => void } for wait-time prefs (A12). */
+    this.wait = wait;
     this.state = this._load();
   }
 
   _load() {
-    const d = { textSize: 'normal', contrast: 'normal', captions: true, volumeMaster: 0.8, volumeVoice: 1.0, volumeAmbient: 0.6, muted: false, fov: 60 };
+    const d = { textSize: 'normal', contrast: 'normal', captions: true, fov: 60 };
     try { Object.assign(d, JSON.parse(localStorage.getItem(`${this.slug}:settings`) || '{}')); } catch { /* ignore */ }
     return d;
   }
@@ -26,6 +29,7 @@ export class Settings {
 
   _build() {
     const q = this.dialog;
+    const wait = this.wait?.get?.();
     q.innerHTML = `
       <h2>Settings</h2>
       <form method="dialog">
@@ -60,13 +64,19 @@ export class Settings {
           </label>
         </fieldset>
         <fieldset>
-          <legend>Audio and captions</legend>
-          <label><input type="checkbox" id="set-captions" ${this.state.captions ? 'checked' : ''}> Captions on</label>
-          <label><input type="checkbox" id="set-muted" ${this.state.muted ? 'checked' : ''}> Mute all audio</label>
-          <label>Master volume <input type="range" id="set-vol-master" min="0" max="1" step="0.05" value="${this.state.volumeMaster}"></label>
-          <label>Voice volume <input type="range" id="set-vol-voice" min="0" max="1" step="0.05" value="${this.state.volumeVoice}"></label>
-          <label>Ambient volume <input type="range" id="set-vol-ambient" min="0" max="1" step="0.05" value="${this.state.volumeAmbient}"></label>
+          <legend>Captions</legend>
+          <label><input type="checkbox" id="set-captions" ${this.state.captions ? 'checked' : ''}> Show cinematic captions</label>
         </fieldset>
+        ${wait !== undefined ? `
+        <fieldset>
+          <legend>Wait time</legend>
+          <label>Wait-time scale
+            <select id="set-wait-scale">
+              ${[0.5, 1, 1.5, 2].map((s) => `<option value="${s}" ${wait.scale === s ? 'selected' : ''}>${s}× (target ${(3 * s).toFixed(1)} seconds)</option>`).join('')}
+            </select>
+          </label>
+          <label><input type="checkbox" id="set-wait-manual" ${wait.manual ? 'checked' : ''}> Manual wait (choose Wait or Speak again instead of timing the silence)</label>
+        </fieldset>` : ''}
         <fieldset>
           <legend>Motion</legend>
           <label><input type="checkbox" id="set-motion" ${this.motion?.reduced ? 'checked' : ''}> Reduce motion (no camera flights; still frames and cuts instead)</label>
@@ -76,7 +86,7 @@ export class Settings {
           <button value="confirm" type="submit" id="set-save">Save settings</button>
         </menu>
       </form>`;
-    const $ = (id) => q.querySelector(id);
+    const $ = (sel) => q.querySelector(sel);
     if (this.quality) $('select#set-quality').value = this.quality.name;
     $('select#set-textsize').value = this.state.textSize;
     $('select#set-contrast').value = this.state.contrast;
@@ -88,11 +98,12 @@ export class Settings {
       this.state.textSize = $('select#set-textsize').value;
       this.state.contrast = $('select#set-contrast').value;
       this.state.captions = $('input#set-captions').checked;
-      this.state.muted = $('input#set-muted').checked;
-      this.state.volumeMaster = parseFloat($('input#set-vol-master').value);
-      this.state.volumeVoice = parseFloat($('input#set-vol-voice').value);
-      this.state.volumeAmbient = parseFloat($('input#set-vol-ambient').value);
       this.state.fov = parseFloat($('input#set-fov').value);
+      if (this.wait) {
+        const scaleEl = $('select#set-wait-scale');
+        const manualEl = $('input#set-wait-manual');
+        if (scaleEl && manualEl) this.wait.set({ scale: parseFloat(scaleEl.value), manual: manualEl.checked });
+      }
       if (this.motion) this.motion.setToggle($('input#set-motion').checked);
       this.save();
       this._apply();
@@ -104,7 +115,6 @@ export class Settings {
     const root = document.documentElement;
     root.dataset.textSize = this.state.textSize;
     root.dataset.contrast = this.state.contrast;
-    this.onVolume?.(this.state);
     this.onFov?.(this.state.fov);
   }
 

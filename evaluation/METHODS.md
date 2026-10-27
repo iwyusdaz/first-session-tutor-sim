@@ -6,8 +6,8 @@ What was run, what it can show, and what it cannot.
 
 | Method | Tool | Scope | Result |
 |---|---|---|---|
-| Rule validation | `scripts/validate-rules.mjs` (runs before every build) | 8 moments, 30 rules, both mixes: every option has a known move, a matching rule, two phrasings, a response, a 1–4 score and a coach note; every rule has a rationale and source and is reachable; no unresolved placeholders; walks every complete path and checks no state leaves 0–4 | pass, 51,840 paths (`results/validate-rules-2026-10-27.txt`) |
-| Unit tests | vitest 5.0.5 | 15 tests: validator, canonical move and domain names match the companion repos exactly, routine time boxes, key rules (telling vs probing, wait time and the quiet student, mix-specific error, generic praise), state bounds, rubric scoring (strong vs weak run, exit-ticket cap, rushed wait), wait-time scale and manual wait, cue mapping, honesty labels | 15/15 pass (`results/unit-tests-2026-10-27.txt`) |
+| Rule validation | `scripts/validate-rules.mjs` (runs before every build) | 8 moments, 30 rules, both mixes: every option has a known move, a matching rule, two phrasings, a response, a 1–4 score and a coach note; every rule has a rationale and source and is reachable; misapplied canonical moves are flagged; no unresolved placeholders; walks every complete path and checks no state leaves 0–4; **relevant body-language observations must agree with the rendered cues on the default path in both mixes** (cue-agreement check) | pass, 51,840 paths (`results/validate-rules-2026-10-27.txt`) |
+| Unit tests | vitest 5.0.5 | 20 tests: validator, canonical move and domain names match the companion repos exactly, routine time boxes, key rules (telling vs probing, wait time and the quiet student, mix-specific error, generic praise, data review targeting, misapplied hint-ladder flags), state bounds, rubric scoring (strong vs weak run, exit-ticket cap, rushed wait), wait-time scale and manual wait, cue mapping (including the confused cue and the cue-agreement walk), honesty labels | 20/20 pass (`results/unit-tests-2026-10-27.txt`) |
 | Functional tests | Playwright 1.64.1, headless Chromium, release build (no test hooks) | 9 tests: four modules by keyboard; pre-check feedback; both mixes end to end with different scores; mix-specific error moment; debrief explanations and coach notes; text-mode parity; resume after reload; timed wait counts rushing as not waiting; reduced-motion intro | 9/9 pass |
 | Accessibility | axe-core 4.14 via Playwright | Intro, a moment, the wait prompt, a reaction, the debrief, text mode, settings and progress dialogs (canvas excluded) | 0 critical or serious issues |
 | Sub-path build test | Playwright + static server | Built app at `/play/first-session-tutor-sim/`: no failed requests, no console errors, canvas renders, text mode opens, "All projects" → `/` | pass |
@@ -19,8 +19,9 @@ Full browser suite: 11/11 pass in 5.2 min (`results/playwright-2026-10-27.txt`).
 
 ## Not run by the builder
 
-- **Headed GPU performance sampling and Lighthouse.** The orchestrator runs these one repo at a time. Performance budgets are not yet measured; see `STATUS.md`.
+- **Headed GPU performance sampling and Lighthouse.** The orchestrator runs these one repo at a time. Performance budgets are not yet measured; see `STATUS.md`. This is still pending after the revision pass — do not treat performance as verified.
 - **Agent-based expert-style reviews** (math teacher, tutoring coach, representation, cue legibility). Added by the orchestrator in `reviews/`.
+- **Human representation review.** The representation persona in `evaluation/reviews/agent-review-expert-style.md` §4 is a simulated reviewer. Its findings were applied by the builder agent (gender and skin-tone reassignment, hood removal, cue rewrites — see `design/character-design.md`), but **no human reviewer with lived experience has checked these characters**. Such a review is recommended before use with real cohorts.
 
 ## What these methods can show
 

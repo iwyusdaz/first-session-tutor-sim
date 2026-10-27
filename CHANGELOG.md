@@ -2,7 +2,18 @@
 
 ## 1.0.0 (unreleased; not tagged yet)
 
-First complete build.
+First complete build, then revised against the seven agent reviews (`evaluation/reviews/`; DECISIONS.md revision log R1–R17).
+
+### Revision pass (2026-10-27)
+
+- Representation: gender and skin tone decorrelated from the behavior patterns (Jordan she/her; darkest tone on the confident student), hood removed as a withdrawal marker, approval-seeking and "work is neat" cues dropped; reasoning and decorrelation table in `design/character-design.md`. No human representation review has been done (stated in METHODS/STATUS).
+- Cues agree with the script: Run 1 starting states match the m1 scene, reactions match resulting poses, and a new validator check (plus unit tests) enforces that relevant body-language observations match the rendered cues on the default path in both mixes.
+- 3D: folded-arms pose reworked, new confused and waiting cues, worksheet close-up views, group view re-centred out from under the side panel, shape+text worksheet marks, HUD state-change and clock signals, window exterior, calmer table, gaze-derived head pitch, Continue control on reduced-motion stills, working captions toggle, S1 shortened to 9 s.
+- Assessment integrity: the move palette shows only what you would say during play (neutral option letters); move names and canonical/misapplied tags are revealed in the debrief; m3/m6 hint-ladder misapplications are labeled as such.
+- Math: m6 worked example is now a genuinely similar problem with a different answer (4x + 1 = x + 13); m7 no longer claims distributing first is required; the m2 review targets each mix's actual misconception.
+- UX/accessibility: replay asks before replacing a finished run; settings persist at startup; no-audio audio controls removed; wait settings available in Settings; skip link targets the session panel; `h1` header; opaque panel, sticky "Say it", 300 ms wait guard, "Wait in silence" wording; restart confirm; timeline titles; debrief lists which cues mattered.
+
+### Initial build
 
 - Tutoring room scene (three.js): Poly Haven CC0 HDRI lighting and PBR textures at real-world scale, canvas whiteboard, worksheets and wall clock, seated tutor view with preset looks at each student.
 - Three simulated students (fictional, constructed for teaching purposes) as stylized procedural figures with posture, gaze and hand cues driven by `content/cues.json`.

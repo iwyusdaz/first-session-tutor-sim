@@ -50,6 +50,8 @@ export class App {
 
     this.panel = document.createElement('section');
     this.panel.className = 'side-panel';
+    this.panel.id = 'session-panel';
+    this.panel.tabIndex = -1;
     this.panel.setAttribute('aria-label', 'Session');
     this.shell.overlays.appendChild(this.panel);
 
@@ -61,7 +63,10 @@ export class App {
       if (this.engine) { if (document.getElementById('textmode').hidden) this.engine.resume(); else this.engine.pause(); }
       this.render();
     });
-    this.shell.on('restart', () => { if (this.state.module === 1 && this.state.run) this.startRun(this.state.run.mixId); else this.render(); });
+    this.shell.on('restart', () => {
+      if (this.state.module === 1 && this.state.run?.log.length && !confirm('Restart the session? The choices made in this run are lost.')) return;
+      if (this.state.module === 1 && this.state.run) this.startRun(this.state.run.mixId); else this.render();
+    });
     this.gotoModule(this.state.run?.done === false ? 1 : 0, { silent: true });
 
     if (__TEST_HOOKS__) {
@@ -331,7 +336,10 @@ export class App {
 
   _initDialogs() {
     this.settings = new Settings({ slug: SLUG, dialog: document.getElementById('settings-dialog'), quality: this.engine?.quality, motion: this.motion,
+      wait: { get: () => this.prefs, set: (p) => this.setPrefs(p) },
       onFov: (fov) => { if (!this.engine) return; this.engine.camera.fov = fov; this.engine.camera.updateProjectionMatrix(); } });
+    // Apply saved text size / contrast / FOV now, not only when the dialog opens (A2/H10).
+    this.settings._apply();
     this.shell.on('settings', (btn) => this.settings.open(btn));
     this.progressPage = new ProgressPage({ slug: SLUG, dialog: document.getElementById('progress-dialog'), record: this.record });
     this.shell.on('progress', (btn) => this.progressPage.open(btn));

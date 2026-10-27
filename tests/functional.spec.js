@@ -28,7 +28,7 @@ async function useManualWait(page) {
 async function playMoment(page, optionId, { wait = true } = {}) {
   await page.locator(`#opt-${optionId}`).check();
   await page.getByRole('button', { name: 'Say it' }).click();
-  const waitBtn = page.getByRole('button', { name: /^Wait \(/ });
+  const waitBtn = page.getByRole('button', { name: /^Wait in silence/ });
   if (await waitBtn.isVisible().catch(() => false)) {
     await (wait ? waitBtn : page.getByRole('button', { name: 'Speak again right away' })).click();
   }
@@ -139,8 +139,34 @@ test('timed wait: speaking again too soon counts as not waiting', async ({ page 
   for (const id of ['greet', 'data', 'probe']) await playMoment(page, id);
   await page.locator('#opt-ask-wait').check();
   await page.getByRole('button', { name: 'Say it' }).click();
+  // The activation guard ignores clicks in the first 300 ms (A11), so wait just past it.
+  await page.waitForTimeout(400);
   await page.locator('#speak-again').click();
   await expect(page.locator('.wait-note')).toHaveText('You spoke again quickly.');
+});
+
+test('the palette shows phrasings only, the debrief names the moves, and replay asks first', async ({ page }) => {
+  test.setTimeout(150_000);
+  await useManualWait(page);
+  await startRun(page, 'Run 1: the quiet student');
+  // During play: neutral option letters plus the words you would say — no
+  // evaluative move names, no canonical tags (heuristics H1 / walkthrough CW3).
+  await expect(page.locator('.palette')).toContainText('Option A');
+  await expect(page.locator('.palette')).not.toContainText('generic group greeting');
+  await expect(page.locator('.palette')).not.toContainText('canonical');
+  for (const id of BEST) await playMoment(page, id);
+  await expect(page.locator('#debrief-h')).toBeVisible();
+  await page.locator('.timeline details summary').first().click();
+  await expect(page.locator('.timeline details').first()).toContainText('greet by name and reference last session');
+  await expect(page.locator('.timeline details').first()).toContainText('(not a canonical move)');
+  // Canonical moves (and misapplied ones) are named in the debrief too.
+  await expect(page.locator('.timeline')).toContainText('(canonical move)');
+  // "Play this run again" warns before replacing the finished run (H2 / CW11).
+  await page.getByRole('button', { name: /Play this run again/ }).click();
+  const armed = page.getByRole('button', { name: /result will be replaced/ });
+  await expect(armed).toBeVisible();
+  await armed.click();
+  await expect(page.locator('#moment-h')).toContainText('Moment 1 of 8');
 });
 
 test('reduced motion: the intro cinematic shows stills with captions and a continue control', async ({ browser }) => {

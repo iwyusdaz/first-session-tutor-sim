@@ -6,7 +6,7 @@
  * student's body language (plan 07 §11).
  * @module ui/session-panel
  */
-import { fill, currentMoment, choose, resolveTarget, studentCues, WAIT_TARGET_SECONDS, STUDENT_IDS } from '../systems/student-model.js';
+import { fill, currentMoment, choose, resolveTarget, studentCues, STUDENT_IDS } from '../systems/student-model.js';
 import { announce } from '../a11y/announcer.js';
 
 /** Tiny element helper. `text` sets textContent; `on*` attaches listeners. */
@@ -58,7 +58,6 @@ export function renderMoment(app, container, { textMode }) {
   const mix = run.mix;
   const m = currentMoment(data, run);
   const f = (t) => fill(t, data, mix);
-  const moveById = Object.fromEntries(data.moves.moves.map((x) => [x.id, x]));
   const block = data.session.routine.find((b) => b.id === m.block);
 
   const wrap = h('div', { class: 'moment' });
@@ -92,14 +91,16 @@ export function renderMoment(app, container, { textMode }) {
   }
   wrap.append(notice);
 
-  const palette = h('fieldset', { class: 'palette' }, h('legend', { text: 'Choose your move' }));
-  for (const o of m.options) {
-    const mv = moveById[o.move];
+  // The palette shows only what you would say plus a neutral letter (H1/CW3):
+  // evaluative move names and canonical tags would give the answer away, so they
+  // are revealed in the debrief instead.
+  const palette = h('fieldset', { class: 'palette' }, h('legend', { text: 'Choose your move' }),
+    h('p', { class: 'hint-note', text: 'Pick what you would actually say. What each choice is called is revealed in the debrief.' }));
+  for (const [i, o] of m.options.entries()) {
     const id = `opt-${o.id}`;
     palette.append(h('label', { class: 'choice move-choice', for: id },
       h('input', { type: 'radio', name: 'move', id, value: o.id }),
-      h('span', {}, h('strong', { text: mv.name }), ` → ${targetLabel(data, mix, o.target)} `,
-        h('span', { class: 'tag', text: mv.canonical ? '(canonical move)' : '(not a canonical move)' }))));
+      h('span', {}, h('strong', { text: `Option ${String.fromCharCode(65 + i)}` }), ` → ${targetLabel(data, mix, o.target)} `)));
   }
   const phrasing = h('div', { class: 'phrasing', hidden: true });
   palette.addEventListener('change', (e) => {
@@ -145,13 +146,12 @@ export function renderMoment(app, container, { textMode }) {
 
   const startWait = (o, idx) => {
     const { scale, manual } = app.prefs;
-    const target = +(WAIT_TARGET_SECONDS * scale).toFixed(1);
     result.replaceChildren(h('p', { class: 'said', text: `You: ${f(o.phrasings[idx])}` }));
     if (manual) {
       result.append(
         h('p', { text: 'Silence after your question. Do you wait, or speak again?' }),
         h('div', { class: 'wait-buttons' },
-          h('button', { type: 'button', text: `Wait (${target}+ seconds of silence)`, onclick: () => commit(o, idx, { manualWaited: true, scale }) }),
+          h('button', { type: 'button', text: 'Wait in silence (the move asks for a few seconds)', onclick: () => commit(o, idx, { manualWaited: true, scale }) }),
           h('button', { type: 'button', text: 'Speak again right away', onclick: () => commit(o, idx, { manualWaited: false, scale }) })),
       );
     } else {
@@ -162,6 +162,9 @@ export function renderMoment(app, container, { textMode }) {
       result.append(
         h('p', {}, 'Silence. Wait as long as feels right, then speak again. ', counter),
         h('button', { type: 'button', class: 'primary', id: 'speak-again', text: 'Speak again', onclick: () => {
+          // Ignore activation in the first 300 ms: a habitual Enter off "Say it"
+          // would end the wait at ~0 s (accessibility A11).
+          if (performance.now() - t0 < 300) return;
           clearInterval(app.waitTimer);
           commit(o, idx, { seconds: (performance.now() - t0) / 1000, scale });
         } }),

@@ -82,6 +82,9 @@ export function validate(data) {
       if (!o.response) errors.push(`${where}: missing response`);
       if (o.wait && (typeof o.response !== 'object' || !o.response.waited || !o.response.rushed)) errors.push(`${where}: wait option needs waited and rushed responses`);
       if (!o.score || !Object.keys(o.score).length) errors.push(`${where}: missing score`);
+      if (o.misapplied && !data.moves.moves.find((mv) => mv.id === o.move)?.canonical) {
+        errors.push(`${where}: "misapplied" only makes sense for a canonical move`);
+      }
       for (const s of Object.values(o.score || {})) if (s < 1 || s > 4) errors.push(`${where}: score out of 1-4`);
       if (!data.notes.notes[m.id]?.[o.id]) errors.push(`${where}: missing coach note`);
     }

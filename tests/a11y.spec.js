@@ -43,14 +43,14 @@ test('overlay UI has no critical or serious axe issues', async ({ page }) => {
   await page.locator('#opt-ask-wait').check();
   await page.getByRole('button', { name: 'Say it' }).click();
   await scan('wait prompt');
-  await page.getByRole('button', { name: /^Wait \(/ }).click();
+  await page.getByRole('button', { name: /^Wait in silence/ }).click();
   await page.locator('#next-moment').click();
   for (const id of ['redirect', 'worked', 'why', 'ticket']) {
     await page.waitForTimeout(100);
     await skip();
     await page.locator(`#opt-${id}`).check();
     await page.getByRole('button', { name: 'Say it' }).click();
-    const w = page.getByRole('button', { name: /^Wait \(/ });
+    const w = page.getByRole('button', { name: /^Wait in silence/ });
     if (await w.isVisible().catch(() => false)) await w.click();
     await page.locator('#next-moment').click();
   }

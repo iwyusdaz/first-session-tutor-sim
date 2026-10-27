@@ -1,4 +1,4 @@
-> **Evaluation status:** Automated functional, accessibility and performance testing plus agent-based design reviews are complete. No real learners have tested this yet. No physical phone testing has been done (mobile was checked with device emulation). See `evaluation/METHODS.md`.
+> **Evaluation status:** Automated functional, accessibility and unit testing plus agent-based design reviews are complete. Headed GPU performance testing is still pending (headless frame pacing only), and no human representation review has been done. No real learners have tested this yet. No physical phone testing has been done (mobile was checked with device emulation). See `evaluation/METHODS.md`.
 
 # First Session: a Tutor Classroom Simulator
 
@@ -58,7 +58,7 @@ See `evaluation/METHODS.md` for what was run and its limits.
 
 ## Accessibility
 
-Full text mode with the same decisions, scoring and replay (state graphs as data tables). Captions with speaker labels for all dialogue. Keyboard operable throughout. Adjustable wait time or manual wait. Reduced-motion versions of all three cinematics, each skippable from the first frame. Text size, contrast and field-of-view settings. See `design/accessibility-plan.md`.
+Full text mode with the same decisions, scoring and replay (state graphs as data tables). All dialogue is shown as on-screen text with speaker names. Keyboard operable throughout. Adjustable wait time or manual wait. Reduced-motion versions of all three cinematics, each skippable from the first frame. Text size, contrast and field-of-view settings. See `design/accessibility-plan.md`.
 
 ## Next steps
 

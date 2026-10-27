@@ -9,7 +9,7 @@ Statuses: **done** (verified by the builder), **done (agent review)** (pending o
 | Move names match `socratic-ai-tutor`; rubric domains match `tutor-training-course` | done | Unit test "canonical vocabulary" checks both lists exactly; `content/moves.json` |
 | Every rule has a rationale and source; the validator passes | done | `scripts/validate-rules.mjs` (30 rules) runs before every build |
 | Both student mixes completable; every outcome reachable | done | Validator walks 51,840 paths; Playwright plays both mixes end to end |
-| Cues legible at the session distance; representation review done | done (agent review) | Cue mapping unit-tested; legibility and representation reviews are run by the orchestrator (`evaluation/reviews/`). Known risk flagged in `design/character-design.md` |
+| Cues legible at the session distance; representation review done | done (agent review) + revised | Agent reviews found the m1 cue/text mismatch, the fists-like fold pose, missing confused/waiting cues, and gender/skin-tone correlations; all fixed in the 2026-10-27 revision pass (DECISIONS.md R1-R9), with a new validator cue-agreement check. **The representation review was a simulated agent persona; no human representation review has been done and one is recommended** (`evaluation/METHODS.md`) |
 | Wait-time scale works; text mode covers every decision | done | Unit test on scale and manual wait; Playwright "timed wait" and "text mode covers the same decisions" |
 | Performance budgets met | pending | Headed GPU sampling is serialized by the orchestrator. Headless only: frame pacing keeps the UI responsive under software WebGL (DECISIONS.md D17) |
 | README: play link, trailer, realism rationale, companion links, evaluation notice | done | Play link marked pending deployment; trailer is a placeholder (not possible here: needs a headed GPU capture) |
@@ -26,7 +26,7 @@ Statuses: **done** (verified by the builder), **done (agent review)** (pending o
 | Two replayable runs with different student mixes | done |
 | Text mode with parity; performance budgets met | text mode done; performance pending |
 | Versioned release build meeting the build contract | done (untagged; tagging is the orchestrator's) |
-| All verification and reviews done; ≥ 5 revisions documented | done (agent review) for reviews and revisions; automated verification done |
+| All verification and reviews done; ≥ 5 revisions documented | done (agent review) for reviews; 17 documented revision fixes applied after them (DECISIONS.md revision log R1-R17); automated verification re-run green |
 
 ## Build contract (08 §5)
 
@@ -56,6 +56,9 @@ Statuses: **done** (verified by the builder), **done (agent review)** (pending o
 | 8 Release build | build contract done; `v1.0.0` tag not created (orchestrator) |
 
 ## Known limitations
+
+- **No human representation review.** The representation persona in `evaluation/reviews/agent-review-expert-style.md` is simulated; the decorrelation fixes (DECISIONS.md R1) were applied by the builder agent. A human reviewer with lived experience of the identities involved should check the characters before real cohorts use this.
+- **Open review findings (deliberately not applied):** hand-up cue gating by context (expert E-T4), per-domain rubric anchors in the debrief level column (E-T7), 3D clock inside the group framing (R-C7, covered by the HUD instead), watch-beat before reaction text (MP6), cue-vocabulary pre-training (MP7). See DECISIONS.md "Not applied".
 
 - No real tutors or students have used the simulator.
 - The behavior model is a simplified teaching model, not validated against real students.
