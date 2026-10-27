@@ -1,0 +1,20 @@
+{
+  "slug": "first-session-tutor-sim",
+  "version": "1.0.0",
+  "title": "First Session: a Tutor Classroom Simulator",
+  "format": "Game",
+  "niche": "Tutor training and teacher education (small-group math tutoring moves, wait time, reading student cues)",
+  "audience": "New tutors (college students, career changers, paraprofessionals), teacher candidates, and tutoring site coordinators who coach them",
+  "summary": "Run a fictional 30-minute small-group math tutoring session with three simulated students. Read their body language, choose tutoring moves at eight decision points, practice real wait time, then review a replay that shows how each student's understanding, engagement and confidence changed. Two student mixes; transparent authored rules, no AI.",
+  "playTimeMinutes": 25,
+  "features": ["text-mode", "keyboard", "reduced-motion", "captions", "mobile-supported", "adjustable-wait-time", "replay-debrief"],
+  "contentNotes": ["Simulated students are fictional and constructed for teaching purposes; one student expresses discouragement about math (\"I'm bad at math\")."],
+  "permissions": [],
+  "poster": {
+    "webp": "poster-1.0.0.webp",
+    "jpg": "poster-1.0.0.jpg",
+    "alt": "Three simulated middle-school students seated at a wooden tutoring table with worksheets, a whiteboard showing a linear equation behind them, seen from the tutor's seat"
+  },
+  "repoUrl": "https://github.com/iwyusdaz/first-session-tutor-sim",
+  "license": { "content": "CC BY 4.0", "code": "MIT" }
+}
