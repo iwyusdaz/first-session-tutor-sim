@@ -1,0 +1,48 @@
+{
+  "_meta": {
+    "budget": "S1 15 s + S2 5 s + S3 15 s = 35 s (budget 90 s; each shot <= 25 s).",
+    "rules": "Skippable from the first frame (Skip button and Esc). Captioned. Reduced motion shows a still frame with the same captions. S1 plays before the first moment of a run, S2 plays before the time-check moment's choices appear, S3 opens the debrief. None plays while a decision is on screen."
+  },
+  "intro": {
+    "id": "intro",
+    "title": "Walking in",
+    "shots": [
+      {
+        "id": "S1", "purpose": "orient", "duration": 15, "easing": "easeInOut",
+        "path": [[1.9, 1.62, 2.7], [0.9, 1.45, 2.1], [0, 1.22, 1.35]],
+        "target": [0, 0.85, -0.6],
+        "captions": ["Your first session with this group: three Grade 7 students, 30 minutes, linear equations.", "Watch the students, not just their answers. How they sit and where they look tells you a lot."],
+        "description": "The camera follows the tutor's view from the doorway to the near side of a small table. Three students sit across the table: one talking, one with a pencil ready, one leaning back with a hood up. A whiteboard is behind them and a wall clock is to the right.",
+        "reducedMotion": "Still frame of the table from the tutor's seat, with both captions."
+      }
+    ]
+  },
+  "timeCheck": {
+    "id": "timeCheck",
+    "title": "Time check",
+    "shots": [
+      {
+        "id": "S2", "purpose": "orient", "duration": 5, "easing": "easeInOut",
+        "path": [[0, 1.22, 1.35], [0.25, 1.24, 1.25]],
+        "target": [1.9, 1.95, -2.44],
+        "captions": ["Three minutes left in the session."],
+        "description": "The view turns to the wall clock, which shows three minutes left.",
+        "reducedMotion": "Still frame of the wall clock with the caption."
+      }
+    ]
+  },
+  "debrief": {
+    "id": "debrief",
+    "title": "Debrief",
+    "shots": [
+      {
+        "id": "S3", "purpose": "reveal", "duration": 15, "easing": "easeInOut",
+        "path": [[0, 1.22, 1.35], [0, 2.2, 2.2], [0, 3.1, 2.6]],
+        "target": [0, 0.7, -0.4],
+        "captions": ["Session over. Let's look at what happened, moment by moment.", "The timeline shows each choice and how each student's understanding, engagement and confidence changed."],
+        "description": "The camera rises above the table to an overview of the three students while the debrief timeline appears.",
+        "reducedMotion": "Still overview of the table with both captions."
+      }
+    ]
+  }
+}

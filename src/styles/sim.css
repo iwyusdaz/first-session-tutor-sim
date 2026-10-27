@@ -1,0 +1,79 @@
+/* Simulator-specific layout: the session panel sits beside (desktop) or below
+   (phone) the 3D view, so students stay visible while you choose a move. */
+
+.side-panel {
+  position: absolute;
+  top: 6.2rem; right: 0.8rem; bottom: 0.8rem;
+  width: min(30rem, 46vw);
+  overflow-y: auto;
+  background: color-mix(in srgb, var(--surface) 95%, transparent);
+  border: 1px solid color-mix(in srgb, var(--muted) 35%, transparent);
+  border-radius: 10px;
+  padding: 0.8rem 1rem;
+  z-index: 6;
+}
+.side-panel[hidden] { display: none; }
+.textmode[hidden] { display: none; }
+
+.side-panel h2, .textmode h2 { font-size: 1.15rem; margin: 0 0 0.4rem; }
+.side-panel h3, .textmode h3 { font-size: 1rem; margin: 0.9rem 0 0.3rem; }
+
+.routine { display: flex; flex-wrap: wrap; gap: 0.25rem; list-style: none; padding: 0; margin: 0.3rem 0 0.6rem; font-size: 0.8rem; }
+.routine li { border: 1px solid color-mix(in srgb, var(--muted) 40%, transparent); border-radius: 4px; padding: 0.1rem 0.4rem; color: var(--muted); }
+.routine li.current { border-color: var(--accent-strong); color: var(--text); font-weight: 600; }
+.routine li.current::before { content: '▶ '; }
+
+.scene-text { font-size: 1rem; }
+.cue-desc summary { cursor: pointer; }
+.cue-desc ul, .cue-after { margin: 0.3rem 0; padding-left: 1.2rem; font-size: 0.92rem; }
+
+.look-buttons { display: flex; flex-wrap: wrap; gap: 0.3rem; margin: 0.5rem 0; }
+.look-buttons button { font-size: 0.82rem; }
+
+.move-choice span .tag { color: var(--muted); font-size: 0.82rem; }
+.phrasing { margin: 0.4rem 0 0; }
+.phrasing select { max-width: 100%; }
+.hint-note { font-size: 0.85rem; color: var(--muted); }
+
+button.primary { background: var(--accent-strong); border-color: var(--accent-strong); color: #fff; font-weight: 600; margin-top: 0.5rem; }
+.result { margin-top: 0.6rem; }
+.said { font-style: italic; }
+.reaction { border-left: 3px solid var(--accent); padding-left: 0.6rem; }
+.wait-note { color: var(--muted); font-size: 0.9rem; }
+.wait-counter { font-variant-numeric: tabular-nums; color: var(--muted); }
+.wait-buttons { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+
+.label-note { font-size: 0.88rem; color: var(--muted); border-left: 3px solid var(--warn); padding-left: 0.6rem; }
+
+.run-card { border: 1px solid color-mix(in srgb, var(--muted) 35%, transparent); border-radius: 8px; padding: 0.6rem 0.8rem; margin: 0.6rem 0; }
+.run-card .status { color: var(--muted); font-size: 0.88rem; }
+
+.timeline { padding-left: 1.2rem; }
+.timeline summary { cursor: pointer; padding: 0.2rem 0; }
+.moment-detail { padding: 0.2rem 0 0.6rem; font-size: 0.92rem; }
+.rule-list { font-size: 0.86rem; }
+.rule-list .source { color: var(--muted); }
+.coach-note { background: color-mix(in srgb, var(--accent) 10%, transparent); padding: 0.4rem 0.6rem; border-radius: 6px; }
+
+.graphs { display: grid; gap: 0.6rem; }
+.graph { margin: 0; }
+.graph svg { width: 100%; height: auto; max-width: 22rem; }
+.graph .grid { stroke: color-mix(in srgb, var(--muted) 30%, transparent); stroke-width: 1; }
+.graph .axis { fill: var(--muted); font-size: 10px; }
+.graph .line { stroke-width: 2.4; }
+.graph .line-u { stroke: var(--accent); }
+.graph .line-e { stroke: var(--ok); }
+.graph .line-c { stroke: var(--warn); }
+.graph .mark { font-size: 9px; }
+.graph .mark-u { fill: var(--accent); }
+.graph .mark-e { fill: var(--ok); }
+.graph .mark-c { fill: var(--warn); }
+.graph .legend { font-size: 0.82rem; color: var(--muted); }
+
+.reflection textarea { width: 100%; font: inherit; color: var(--text); background: var(--bg); border: 1px solid color-mix(in srgb, var(--muted) 45%, transparent); border-radius: 6px; padding: 0.4rem; }
+.reflection label { display: block; margin-top: 0.5rem; }
+.debrief-actions { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.8rem; }
+
+@media (max-width: 760px) {
+  .side-panel { top: auto; left: 0.4rem; right: 0.4rem; bottom: 0.4rem; width: auto; max-height: 55vh; }
+}

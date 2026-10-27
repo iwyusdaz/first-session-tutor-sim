@@ -1,0 +1,28 @@
+{
+  "name": "first-session-tutor-sim",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "A three.js simulation: run your first tutoring session with three simulated students — read cues, choose moves, practice wait time, review the replay",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "node scripts/validate-rules.mjs && node scripts/build-attribution.mjs && vite build",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "validate:rules": "node scripts/validate-rules.mjs",
+    "validate:showcase": "node scripts/validate-showcase.mjs 1.0.0",
+    "poster": "node scripts/render-poster.mjs"
+  },
+  "dependencies": {
+    "three": "0.186.1"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "4.14.0",
+    "@playwright/test": "1.64.1",
+    "vite": "8.3.5",
+    "vitest": "5.0.5"
+  }
+}

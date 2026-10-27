@@ -1,0 +1,80 @@
+{
+  "_meta": {
+    "note": "Pre-check and post-check are parallel items (same objectives, different situations). Objectives are numbered as in design/learning-objectives.md."
+  },
+  "preCheck": [
+    {
+      "id": "pre1", "objective": 5,
+      "prompt": "A student writes 2(x − 4) = 2x − 4. Which response keeps the student doing the thinking?",
+      "options": [
+        { "id": "a", "text": "\"What did the 2 multiply?\"", "why": "A question at the spot where the error is lets the student find the fix (probing question, P3)." },
+        { "id": "b", "text": "\"You forgot to distribute.\"", "why": "Naming the misconception gives the diagnosis away; the student has nothing left to figure out." },
+        { "id": "c", "text": "\"It should be 2x − 8.\"", "why": "Correcting it makes the line right, but the student produced nothing." }
+      ],
+      "correct": "a"
+    },
+    {
+      "id": "pre2", "objective": 4,
+      "prompt": "After you ask the group a question, how long should you wait before speaking again?",
+      "options": [
+        { "id": "a", "text": "About 1 second", "why": "About a second was the typical wait in Rowe's classroom studies. At that pace the fastest student answers for everyone." },
+        { "id": "b", "text": "3 to 5 seconds", "why": "Waiting 3–5 seconds gives quieter students time to answer (wait time, Q4)." },
+        { "id": "c", "text": "Until the first hand goes up", "why": "The first hand up is usually the same student every time; others stop trying." }
+      ],
+      "correct": "b"
+    },
+    {
+      "id": "pre3", "objective": 6,
+      "prompt": "Three minutes are left and the exit ticket hasn't been given. A student asks a great question about a harder problem. What do you do?",
+      "options": [
+        { "id": "a", "text": "Answer the question and skip the ticket today.", "why": "Skipping the exit ticket breaks the data loop; next session's review has nothing to go on." },
+        { "id": "b", "text": "Park the question for next session and give the exit ticket.", "why": "Protecting the ticket keeps the data loop intact, and the question becomes next session's opener (S3, D1)." },
+        { "id": "c", "text": "Squeeze in the harder problem, then a quick ticket.", "why": "A rushed ticket gives weak data. A good instinct at the wrong time." }
+      ],
+      "correct": "b"
+    }
+  ],
+  "postCheck": [
+    {
+      "id": "post1", "objective": 5,
+      "prompt": "A student turns 3x − 5 = 10 into 3x = 5. What's the strongest first response?",
+      "options": [
+        { "id": "a", "text": "\"Check the −5. What happens to it when it moves?\"", "why": "It points at the spot without naming the error, so the student does the repair." },
+        { "id": "b", "text": "\"Add 5 to both sides first.\"", "why": "A partial step jumps up the hint ladder before the student has looked again." },
+        { "id": "c", "text": "\"That's a sign error.\"", "why": "Naming the label hands over the diagnosis." }
+      ],
+      "correct": "a"
+    },
+    {
+      "id": "post2", "objective": 3,
+      "prompt": "While you explain, a student stops writing and looks toward the window. What does that most likely tell you?",
+      "options": [
+        { "id": "a", "text": "They have finished the problem.", "why": "Possible, but a pencil down and eyes away while you're explaining usually means the opposite." },
+        { "id": "b", "text": "They may be confused or checked out. Ask them a question.", "why": "Body language is the earliest signal. A direct, low-stakes question brings them back in." },
+        { "id": "c", "text": "Nothing. Only their answers matter.", "why": "Waiting for a wrong answer means you notice too late." }
+      ],
+      "correct": "b"
+    },
+    {
+      "id": "post3", "objective": 2,
+      "prompt": "A discouraged student has failed the same step three times. What's the best move?",
+      "options": [
+        { "id": "a", "text": "Give one more hint on the same step.", "why": "After three failures, more hints turn struggle unproductive (P7)." },
+        { "id": "b", "text": "Acknowledge it, work a similar problem all the way through, then return to theirs.", "why": "A worked example after repeated failure consolidates the step (P7, Q5)." },
+        { "id": "c", "text": "Show the full solution so they can move on.", "why": "The full solution is a last resort after a worked example; here it confirms 'I can't do it'." }
+      ],
+      "correct": "b"
+    }
+  ],
+  "reflection": [
+    { "id": "refl-moment", "prompt": "Pick one moment from the timeline. What would you do differently, and what cue would tell you it was working?" },
+    { "id": "refl-transfer", "prompt": "You'll see a real group next week. Which one move will you practice first, and how will you know you did it?" }
+  ],
+  "rubricLevels": {
+    "source": "tutor-training-course/docs/coaching/observation-rubric.md (levels in one line each, copied)",
+    "1": "absent, or the failure mode dominates",
+    "2": "present but generic or inconsistent",
+    "3": "consistent, student mostly produces",
+    "4": "consistent, specific, and the student does the thinking"
+  }
+}

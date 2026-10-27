@@ -1,0 +1,78 @@
+{
+  "_meta": {
+    "label": "Simplified teaching model, not a validated psychological model.",
+    "state": "Each student has understanding (u), engagement (e) and confidence (c), integers 0-4, clamped.",
+    "matching": "A rule applies when its move and context match the chosen option and every condition holds. All matching rules apply, in order.",
+    "targets": "'target' is the student the move is aimed at; 'others' is everyone else; a student id (A, B, C) names one student.",
+    "sources": "Rationales cite socratic-ai-tutor/spec/pedagogy-rules.md (P1-P7), tutor-training-course/research/competency-model.md (R, S, Q, F, D behaviors) and research/sources.md."
+  },
+  "rules": [
+    { "id": "r-greet-ref", "move": "greet-reference", "context": "greeting", "effects": { "all": { "e": 1, "c": 1 } },
+      "rationale": "Greeting each student by name and naming something they did last time signals the tutor knows them and expects them to succeed.", "source": "competency-model R1, R2" },
+    { "id": "r-greet-group", "move": "group-greet", "context": "greeting", "effects": {},
+      "rationale": "A generic greeting neither helps nor harms much; nobody is singled out, nobody is seen.", "source": "observation-rubric Domain 1 level 2" },
+    { "id": "r-cold-open", "move": "cold-open", "context": "greeting", "effects": { "all": { "e": -1 }, "C": { "c": -1 } },
+      "rationale": "A cold start into the worksheet is a named failure mode; the discouraged student reads it as 'here we go again'.", "source": "competency-model Domain 1 failure modes" },
+
+    { "id": "r-review-data", "move": "review-ticket-data", "context": "review", "effects": { "all": { "u": 1 } },
+      "rationale": "Reviewing the exact error last ticket showed targets the misconception each student actually has.", "source": "competency-model S1, D3" },
+    { "id": "r-review-vague", "move": "vague-review", "context": "review", "effects": {},
+      "rationale": "'Let's keep working on equations' targets nothing, so nothing changes.", "source": "observation-rubric Domain 1 level 2, Domain 5 level 2" },
+    { "id": "r-review-skip", "move": "skip-review", "context": "review", "effects": { "A": { "u": -1 } },
+      "rationale": "Without the review, the sign error from last ticket carries into today's practice.", "source": "competency-model S1" },
+
+    { "id": "r-err-probe-engaged", "move": "probing-question", "context": "error", "when": { "targetMinEngagement": 2 }, "effects": { "target": { "u": 2 } },
+      "rationale": "A question at the misconception's spot lets an engaged student find and own the fix; self-generated repair beats received repair.", "source": "pedagogy-rules P3; Chi et al. 1989 (via companion)" },
+    { "id": "r-err-probe-low", "move": "probing-question", "context": "error", "when": { "targetMaxEngagement": 1 }, "effects": { "target": { "u": 1 } },
+      "rationale": "A disengaged student gains less from the same question; the move still beats correcting.", "source": "pedagogy-rules P3" },
+    { "id": "r-err-ladder-skip", "move": "hint-ladder", "context": "error", "effects": { "target": { "u": 1 } },
+      "rationale": "Jumping straight to a partial step (L3) skips rungs: the student copies the step rather than finding it.", "source": "pedagogy-rules P2; competency-model Q2" },
+    { "id": "r-err-name", "move": "name-misconception", "context": "error", "effects": { "target": { "c": -1 } },
+      "rationale": "Naming the label ('you forgot to distribute') gives the diagnosis away and lands as a verdict.", "source": "pedagogy-rules P3; competency-model Q3" },
+    { "id": "r-err-tell", "move": "tell-answer", "context": "error", "effects": {},
+      "rationale": "Telling the answer makes this line correct but the student produced nothing, so understanding does not grow.", "source": "plan 07 §5.3; pedagogy-rules P1" },
+
+    { "id": "r-gq-probe-waited", "move": "probing-question", "context": "group-question", "when": { "waited": true }, "effects": { "B": { "u": 1, "e": 1, "c": 1 } },
+      "rationale": "Waiting 3-5 seconds gives the quieter student time to answer; in Rowe's studies, longer waits brought longer and more unsolicited student answers.", "source": "competency-model Q4; Rowe 1972 (ERIC ED061103)" },
+    { "id": "r-gq-probe-rushed", "move": "probing-question", "context": "group-question", "when": { "waited": false }, "effects": { "A": { "c": 1 }, "B": { "e": -1 } },
+      "rationale": "Speaking again too soon means the fastest student answers and the quieter one learns not to try.", "source": "competency-model Q4; Rowe 1972" },
+    { "id": "r-gq-volunteer", "move": "call-on-volunteer", "context": "group-question", "effects": { "A": { "c": 1 }, "B": { "e": -1 }, "C": { "e": -1 } },
+      "rationale": "Taking the first raised hand every time hands the session to one student.", "source": "competency-model R4" },
+    { "id": "r-gq-self", "move": "answer-yourself", "context": "group-question", "effects": { "all": { "e": -1 } },
+      "rationale": "Answering your own question turns students into an audience.", "source": "competency-model Q4; observation-rubric Domain 3 level 2" },
+
+    { "id": "r-int-redirect", "move": "redirect-invite", "context": "interruption", "effects": { "B": { "e": 1, "c": 1 } },
+      "rationale": "Holding the interrupter's thought and handing the turn back keeps attention distributed.", "source": "competency-model R4" },
+    { "id": "r-int-let", "move": "let-finish", "context": "interruption", "effects": { "A": { "c": 1 }, "B": { "e": -1, "c": -1 } },
+      "rationale": "Letting the interrupter finish teaches the quieter student their turn can be taken.", "source": "competency-model R4" },
+    { "id": "r-int-moveon", "move": "move-on", "context": "interruption", "effects": { "B": { "e": -1 } },
+      "rationale": "Moving on leaves the student who was cut off without an answer.", "source": "competency-model R4" },
+
+    { "id": "r-fr-worked", "move": "worked-example", "context": "frustration", "effects": { "C": { "u": 2, "e": 1, "c": 1 } },
+      "rationale": "After repeated failure, a worked example of a similar problem consolidates the step; acknowledging the frustration first keeps the student in the work.", "source": "pedagogy-rules P7; Sweller et al. 2019, Kapur 2008 (via companion)" },
+    { "id": "r-fr-specific", "move": "specific-feedback", "context": "frustration", "effects": { "C": { "u": 1, "c": 1 } },
+      "rationale": "Naming what the student did right (process-level feedback) rebuilds confidence and points at the next step.", "source": "pedagogy-rules P4; competency-model F1; Hattie & Timperley 2007 (via companion)" },
+    { "id": "r-fr-ladder", "move": "hint-ladder", "context": "frustration", "effects": { "C": { "e": -1, "c": -1 } },
+      "rationale": "Another hint on the same step after three failures turns struggle unproductive; P7 says stop climbing.", "source": "pedagogy-rules P7" },
+    { "id": "r-fr-full", "move": "full-solution", "context": "frustration", "effects": { "C": { "c": -1 } },
+      "rationale": "Giving the whole solution (L5) skips the worked-example rung and confirms the student 'can't do it'.", "source": "competency-model Q6" },
+    { "id": "r-fr-praise", "move": "generic-praise", "context": "frustration", "effects": { "C": { "e": -1 } },
+      "rationale": "'You're doing great' after three failures reads as untrue; generic praise does not help the step.", "source": "competency-model F1 failure modes" },
+
+    { "id": "r-cor-why-waited", "move": "confirm-ask-why", "context": "correct", "when": { "waited": true }, "effects": { "target": { "u": 1, "e": 1, "c": 1 } },
+      "rationale": "Confirming briefly and waiting for the why gives the student the self-explanation that makes the learning stick.", "source": "pedagogy-rules P4; competency-model F3, Q4" },
+    { "id": "r-cor-why-rushed", "move": "confirm-ask-why", "context": "correct", "when": { "waited": false }, "effects": { "target": { "e": -1 } },
+      "rationale": "Asking why and then filling the silence yourself tells the student the question was not really theirs.", "source": "competency-model Q4" },
+    { "id": "r-cor-similar", "move": "similar-problem", "context": "correct", "effects": { "target": { "u": 1, "c": 1 } },
+      "rationale": "A near-transfer problem is the smallest honest test that the fix holds.", "source": "pedagogy-rules P5; competency-model F4" },
+    { "id": "r-cor-praise", "move": "generic-praise", "context": "correct", "effects": {},
+      "rationale": "'Good job' confirms but names nothing the student can repeat.", "source": "competency-model F1" },
+
+    { "id": "r-tc-ticket", "move": "give-exit-ticket", "context": "time-check", "effects": {}, "events": ["ticket-given"],
+      "rationale": "The exit ticket is the hinge between sessions: it is what tells you what to review next time.", "source": "competency-model S3, D1" },
+    { "id": "r-tc-similar", "move": "similar-problem", "context": "time-check", "effects": { "B": { "u": 1 } }, "events": ["ticket-rushed"],
+      "rationale": "A good move at the wrong time: one more problem squeezes the exit ticket into the last minute.", "source": "competency-model S2" },
+    { "id": "r-tc-skip", "move": "skip-exit-ticket", "context": "time-check", "effects": {}, "events": ["no-ticket"],
+      "rationale": "Skipping the ticket to finish a problem breaks the data loop; the rubric caps Session structure at level 1.", "source": "observation-rubric Domain 2 level 1" }
+  ]
+}

@@ -1,0 +1,23 @@
+[
+  {
+    "asset": "School Hall (HDRI, 1k .hdr)",
+    "author": "Dimitrios Savva, Jarod Guest",
+    "source": "https://polyhaven.com/a/school_hall",
+    "license": "CC0",
+    "changes": "None. Used for image-based lighting and reflections only (not shown as a background). File renamed with a content hash."
+  },
+  {
+    "asset": "Wood Table 001 (1k JPG: color, normal GL, roughness)",
+    "author": "Dimitrios Savva, Rico Cilliers",
+    "source": "https://polyhaven.com/a/wood_table_001",
+    "license": "CC0",
+    "changes": "None to pixels. Used on the tutoring table; files renamed with content hashes."
+  },
+  {
+    "asset": "three.js 0.186.1",
+    "author": "three.js authors",
+    "source": "https://github.com/mrdoob/three.js",
+    "license": "MIT",
+    "changes": "None. Bundled by Vite. No Draco/Basis decoders are shipped, because the project loads no compressed models or textures."
+  }
+]

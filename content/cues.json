@@ -1,0 +1,22 @@
+{
+  "_meta": {
+    "label": "Simplified teaching model: how a student's state shows up in posture, gaze and hand activity. Cues come from engagement (e) and confidence (c); understanding (u) shows only in their written work.",
+    "faces": "Faces stay subtle (no expressions beyond a slight head tilt) and there is no lip sync; dialogue is shown as captions. See design/character-design.md."
+  },
+  "posture": [
+    { "id": "engaged", "when": { "eMin": 3 }, "lean": 0.18, "headPitch": 0.2, "description": "leaning in toward the table" },
+    { "id": "neutral", "when": { "eMin": 2, "eMax": 2 }, "lean": 0.0, "headPitch": -0.05, "description": "sitting upright" },
+    { "id": "withdrawn", "when": { "eMax": 1 }, "lean": -0.22, "headPitch": -0.08, "description": "slumped back in the chair" }
+  ],
+  "gaze": [
+    { "id": "on-work", "when": { "eMin": 3 }, "target": "worksheet", "description": "looking at the worksheet" },
+    { "id": "on-tutor", "when": { "eMin": 2, "eMax": 2 }, "target": "tutor", "description": "looking at you" },
+    { "id": "away", "when": { "eMax": 1 }, "target": "window", "description": "looking toward the window" }
+  ],
+  "hands": [
+    { "id": "hand-up", "when": { "eMin": 4, "cMin": 3 }, "action": "raise", "description": "hand up, ready to answer" },
+    { "id": "writing", "when": { "eMin": 2, "cMin": 2 }, "action": "write", "description": "writing" },
+    { "id": "pencil-down", "when": { "eMin": 2, "cMax": 1 }, "action": "still", "description": "pencil down, not writing" },
+    { "id": "arms-folded", "when": { "eMax": 1 }, "action": "fold", "description": "arms folded" }
+  ]
+}

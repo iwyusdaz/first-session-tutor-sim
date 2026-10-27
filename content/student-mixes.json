@@ -1,0 +1,71 @@
+{
+  "_meta": {
+    "label": "All three students are fictional, constructed for teaching purposes. No real likeness.",
+    "representation": "Patterns (confident, quiet, discouraged) are not tied to any demographic trait. Names and looks were chosen so no pattern lines up with a common stereotype; see design/character-design.md.",
+    "stateScale": "u = understanding, e = engagement, c = confidence; integers 0-4"
+  },
+  "students": {
+    "A": {
+      "name": "Jordan",
+      "pronoun": "he",
+      "pattern": "Confident; answers fast; makes sign errors",
+      "look": { "skin": "#8d5a3b", "hair": "#1f1a17", "hairStyle": "short", "shirt": "#2f6fd0", "seat": -1 }
+    },
+    "B": {
+      "name": "Talia",
+      "pronoun": "she",
+      "pattern": "Quiet; understands more than she shows",
+      "look": { "skin": "#d9a882", "hair": "#6b3e1f", "hairStyle": "long", "shirt": "#3c8a5a", "seat": 0 }
+    },
+    "C": {
+      "name": "Sam",
+      "pronoun": "they",
+      "pattern": "Discouraged by earlier failure; says 'I'm bad at math'",
+      "look": { "skin": "#5c3b28", "hair": "#141110", "hairStyle": "hood", "shirt": "#8a4f9e", "seat": 1 }
+    }
+  },
+  "mixes": [
+    {
+      "id": "quiet",
+      "name": "Run 1: the quiet student",
+      "description": "Talia barely speaks unless given room. Jordan answers first. Sam is wary from the start.",
+      "initial": {
+        "A": { "u": 2, "e": 3, "c": 3 },
+        "B": { "u": 3, "e": 1, "c": 1 },
+        "C": { "u": 1, "e": 2, "c": 1 }
+      },
+      "error": {
+        "student": "A",
+        "problem": "3x − 5 = 10",
+        "work": "3x = 5",
+        "misconception": "M2 — sign error when moving a term",
+        "probe": "Check the −5. What happens to it when it moves to the other side?",
+        "partialStep": "Add 5 to both sides first: 3x − 5 + 5 = 10 + 5.",
+        "label": "You flipped the sign wrong.",
+        "answer": "It's 3x = 15, so x = 5.",
+        "fixed": ["3x − 5 + 5 = 10 + 5", "3x = 15", "x = 5"]
+      }
+    },
+    {
+      "id": "dominant",
+      "name": "Run 2: the dominant student",
+      "description": "Jordan fills every silence and wants harder problems. Talia is a little more willing to talk. Sam makes the first error.",
+      "initial": {
+        "A": { "u": 2, "e": 4, "c": 4 },
+        "B": { "u": 3, "e": 2, "c": 2 },
+        "C": { "u": 2, "e": 2, "c": 2 }
+      },
+      "error": {
+        "student": "C",
+        "problem": "2(x − 4) = 10",
+        "work": "2x − 4 = 10",
+        "misconception": "M3 — distributing to only the first term",
+        "probe": "Look at the left side. What did the 2 multiply?",
+        "partialStep": "The 2 multiplies both terms: 2 · x and 2 · (−4).",
+        "label": "You forgot to distribute.",
+        "answer": "It's 2x − 8 = 10, so x = 9.",
+        "fixed": ["2x − 8 = 10", "2x = 18", "x = 9"]
+      }
+    }
+  ]
+}

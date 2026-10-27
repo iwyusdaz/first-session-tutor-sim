@@ -1,0 +1,51 @@
+{
+  "_meta": {
+    "label": "Coach notes are written for the debrief. They are not feedback from a real coach.",
+    "keys": "notes[momentId][optionId]. Each note names the rubric domain it maps to."
+  },
+  "notes": {
+    "m1": {
+      "greet": "Names plus a specific reference to last session is the level-4 opening (R1, R2). Watch how the discouraged student looks up.",
+      "group": "A group greeting is fine but sees nobody (rubric Domain 1, level 2). One sentence per student with a real reference changes the room.",
+      "cold": "A cold open is a named failure mode. The student who already expects to fail reads it as confirmation."
+    },
+    "m2": {
+      "data": "Reviewing straight from the tickets is the data loop working (S1, D3). The students whose error you named now have a reason to pay attention.",
+      "vague": "'Like last time' targets nothing. The tickets already told you which error to review; using them is the whole point (Domain 5).",
+      "skip": "Skipping review saves five minutes and costs the session's target. The sign error from the ticket comes straight back."
+    },
+    "m3": {
+      "probe": "A question at the spot where the error is, without naming it, lets the student find the fix (Q3, P3). That's the move the whole program is built on.",
+      "partial": "A partial step jumps straight to ladder rung 3. The student copies it instead of finding it. Try a probing question (rung 0) first.",
+      "label": "Naming the misconception hands over the diagnosis and lands as a verdict. Name the symptom in a question instead: 'What did the 2 multiply?'",
+      "tell": "Telling the answer makes the line right and leaves the student's understanding where it was. They produced nothing."
+    },
+    "m4": {
+      "ask-wait": "Asking the group and then waiting is where the quiet student gets in. If you spoke again before 3 seconds, the fastest student answered for everyone (Q4).",
+      "volunteer": "Taking the first hand every time gives the session to one student (R4). The other two learn to wait.",
+      "self": "Answering your own question turns the group into an audience (rubric Domain 3, level 2)."
+    },
+    "m5": {
+      "redirect": "Holding the interrupter's idea and handing the turn back is how attention stays distributed (R4).",
+      "let": "Praising the interrupter in that moment rewards the interruption. The quieter student erased her note; watch for that cue.",
+      "move-on": "Moving on is neutral for the content and costly for the student who was cut off."
+    },
+    "m6": {
+      "worked": "Three failures on the same step is the P7 trigger: acknowledge the frustration, then work a similar problem fully, then return to the original (Q5).",
+      "specific": "Naming the part that was right is good feedback (F1) and rebuilds some confidence, but after three failures a worked example is the stronger move.",
+      "ladder": "Another hint after three failures keeps the student in unproductive struggle. P7 says stop climbing.",
+      "full": "The full solution (rung 5) is a last resort after the worked example. Here it confirms the student 'can't do it' (Q6).",
+      "praise": "'You're doing great' after three failures reads as untrue. Specific, process-level feedback works; generic praise doesn't."
+    },
+    "m7": {
+      "why": "Confirm briefly, ask one why, and then wait. If you filled the silence yourself, the self-explanation didn't happen (F3, Q4).",
+      "similar": "Offering a similar problem is a good move (F4, P5). Asking why first would have let her explain the step she got right.",
+      "praise": "'Good job' confirms but names nothing she can repeat. Say what in her work was right (F1)."
+    },
+    "m8": {
+      "ticket": "Protecting the exit ticket and parking the question for next time keeps the data loop intact (S3, D1).",
+      "one-more": "One more problem is a good instinct at the wrong time. A rushed ticket is weak data for Thursday's review.",
+      "skip": "Skipping the exit ticket caps Session structure at level 1 on the rubric. Thursday's review has nothing to go on."
+    }
+  }
+}

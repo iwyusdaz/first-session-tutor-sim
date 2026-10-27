@@ -1,0 +1,50 @@
+{
+  "_meta": {
+    "canonicalSource": "socratic-ai-tutor/spec/pedagogy-rules.md v1.0 (2026-10-25) — names copied exactly",
+    "domainsSource": "tutor-training-course/research/competency-model.md v1.0 (locked)",
+    "note": "The seven canonical moves are the shared vocabulary. The other moves are common tutor responses, some of them failure modes, included so the palette offers realistic choices. They are labeled 'not a canonical move' in the app."
+  },
+  "domains": [
+    { "id": 1, "name": "Relationships" },
+    { "id": 2, "name": "Session structure" },
+    { "id": 3, "name": "Questioning and errors" },
+    { "id": 4, "name": "Feedback and motivation" },
+    { "id": 5, "name": "Data use" }
+  ],
+  "ladder": [
+    { "level": 0, "name": "probing question", "givenWhen": "every fresh problem" },
+    { "level": 1, "name": "conceptual nudge", "givenWhen": "learner has made an attempt" },
+    { "level": 2, "name": "strategy hint", "givenWhen": "L1 didn't unblock" },
+    { "level": 3, "name": "partial step", "givenWhen": "L2 didn't unblock" },
+    { "level": 4, "name": "worked example after repeated failure", "givenWhen": "repeated failure (P7)" },
+    { "level": 5, "name": "full solution + new problem", "givenWhen": "last resort only" }
+  ],
+  "moves": [
+    { "id": "probing-question", "name": "probing question", "canonical": true, "rule": "P1, P3", "domain": 3, "behaviors": ["Q1", "Q3"], "asksQuestion": true },
+    { "id": "hint-ladder", "name": "hint ladder (levels 0–5)", "canonical": true, "rule": "P2", "domain": 3, "behaviors": ["Q2"] },
+    { "id": "wait-time", "name": "wait time", "canonical": true, "rule": "P6", "domain": 3, "behaviors": ["Q4"] },
+    { "id": "specific-feedback", "name": "specific feedback", "canonical": true, "rule": "P4", "domain": 4, "behaviors": ["F1"] },
+    { "id": "worked-example", "name": "worked example after repeated failure", "canonical": true, "rule": "P7", "domain": 3, "behaviors": ["Q5"] },
+    { "id": "confirm-ask-why", "name": "confirm and ask why", "canonical": true, "rule": "P4", "domain": 4, "behaviors": ["F3"], "asksQuestion": true },
+    { "id": "similar-problem", "name": "offer a similar problem", "canonical": true, "rule": "P5", "domain": 4, "behaviors": ["F4"] },
+
+    { "id": "greet-reference", "name": "greet by name and reference last session", "canonical": false, "domain": 1, "behaviors": ["R1", "R2"] },
+    { "id": "group-greet", "name": "generic group greeting", "canonical": false, "domain": 1, "behaviors": ["R1"] },
+    { "id": "cold-open", "name": "start straight on the worksheet", "canonical": false, "domain": 1, "behaviors": ["R1"] },
+    { "id": "review-ticket-data", "name": "review from last exit ticket", "canonical": false, "domain": 5, "behaviors": ["S1", "D3"] },
+    { "id": "vague-review", "name": "vague review", "canonical": false, "domain": 5, "behaviors": ["D3"] },
+    { "id": "skip-review", "name": "skip the review", "canonical": false, "domain": 2, "behaviors": ["S1"] },
+    { "id": "normalize-mistake", "name": "normalize the mistake", "canonical": false, "domain": 4, "behaviors": ["F2"] },
+    { "id": "tell-answer", "name": "tell the answer", "canonical": false, "domain": 3, "behaviors": ["Q3"] },
+    { "id": "name-misconception", "name": "name the misconception", "canonical": false, "domain": 3, "behaviors": ["Q3"] },
+    { "id": "generic-praise", "name": "generic praise", "canonical": false, "domain": 4, "behaviors": ["F1"] },
+    { "id": "call-on-volunteer", "name": "take the raised hand", "canonical": false, "domain": 1, "behaviors": ["R4"] },
+    { "id": "answer-yourself", "name": "answer it yourself", "canonical": false, "domain": 3, "behaviors": ["Q4"] },
+    { "id": "redirect-invite", "name": "redirect and invite another student", "canonical": false, "domain": 1, "behaviors": ["R4"] },
+    { "id": "let-finish", "name": "let the interrupting student finish", "canonical": false, "domain": 1, "behaviors": ["R4"] },
+    { "id": "full-solution", "name": "give the full solution (L5)", "canonical": false, "domain": 3, "behaviors": ["Q6"] },
+    { "id": "move-on", "name": "move on for now", "canonical": false, "domain": 3, "behaviors": [] },
+    { "id": "give-exit-ticket", "name": "give the exit ticket", "canonical": false, "domain": 2, "behaviors": ["S3", "D1"] },
+    { "id": "skip-exit-ticket", "name": "skip the exit ticket to finish the problem", "canonical": false, "domain": 2, "behaviors": ["S3"] }
+  ]
+}

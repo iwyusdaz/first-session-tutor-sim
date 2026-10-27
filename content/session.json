@@ -1,0 +1,200 @@
+{
+  "_meta": {
+    "label": "Fictional session, constructed for teaching purposes (Bridge Math Tutoring is fictional, shared with tutor-training-course).",
+    "placeholders": "{A} {B} {C} are student names; {E} is the student who makes the error in this mix; {err.*} come from the mix's error block.",
+    "phrasings": "Each option has equivalent phrasings. The model and the score respond to the move, not the wording.",
+    "score": "Each option scores 1-4 on one or more rubric domains, using the observation-rubric anchors (tutor-training-course/docs/coaching/observation-rubric.md)."
+  },
+  "routine": [
+    { "id": "warm-up", "name": "Warm-up", "minutes": 5 },
+    { "id": "review", "name": "Review of last exit ticket", "minutes": 5 },
+    { "id": "guided", "name": "Guided practice", "minutes": 12 },
+    { "id": "independent", "name": "Independent try", "minutes": 5 },
+    { "id": "exit", "name": "Exit ticket", "minutes": 3 }
+  ],
+  "moments": [
+    {
+      "id": "m1", "clock": "0:30", "block": "warm-up", "context": "greeting", "domain": 1,
+      "board": "x + 4 = 9",
+      "work": { "A": ["Warm-up", "x + 4 = 9", "x = 5"], "B": ["Warm-up", "x + 4 = 9", "x = 5"], "C": ["Warm-up", "x + 4 = 9"] },
+      "scene": "You sit down at the table. {A} is already talking about a video game. {B} has her worksheet out and her pencil ready. {C} sits back, hood up, arms folded.",
+      "observations": [
+        { "id": "o1a", "student": "C", "text": "{C} has their arms folded and hasn't looked up.", "relevant": true },
+        { "id": "o1b", "student": "B", "text": "{B} is ready to work but hasn't said anything.", "relevant": true },
+        { "id": "o1c", "student": "A", "text": "{A} is wearing a blue shirt.", "relevant": false },
+        { "id": "o1d", "student": null, "text": "The wall clock shows 3:00.", "relevant": false }
+      ],
+      "options": [
+        { "id": "greet", "move": "greet-reference", "target": "all", "score": { "1": 4 },
+          "phrasings": ["\"Hi {A}, {B}, {C}. {C}, yesterday you cracked the sign problem on question 2. Let's build on that.\"", "\"Hey, {A}. {B}, good to see you. {C}, you got question 2 on Tuesday's ticket. Ready to keep going?\""],
+          "response": "{C} glances up for a second. {B} sits a little straighter. {A} says, \"Okay, okay, I'm ready.\"" },
+        { "id": "group", "move": "group-greet", "target": "all", "score": { "1": 2 },
+          "phrasings": ["\"Hey guys, let's get started.\"", "\"Okay everyone, let's go.\""],
+          "response": "{A} keeps talking about the game for a moment. {B} and {C} don't react." },
+        { "id": "cold", "move": "cold-open", "target": "all", "score": { "1": 1 },
+          "phrasings": ["\"Page 4, problem 1. Go.\"", "\"Okay, worksheets out, first problem.\""],
+          "response": "{C} slumps lower. {B} starts writing silently. {A} sighs loudly." }
+      ]
+    },
+    {
+      "id": "m2", "clock": "5:00", "block": "review", "context": "review", "domain": 5,
+      "board": "Tuesday: 2x − 3 = 7",
+      "work": { "A": ["Ticket (Tue)", "2x − 3 = 7", "2x = 4"], "B": ["Ticket (Tue)", "2x − 3 = 7", "2x = 10", "x = 5"], "C": ["Ticket (Tue)", "2x − 3 = 7", "2x = 4"] },
+      "scene": "Last session's exit tickets are on the table. Two of the three show the same mistake: moving a term without changing its sign.",
+      "observations": [
+        { "id": "o2a", "student": null, "text": "Two of three exit tickets show a sign error when moving a term.", "relevant": true },
+        { "id": "o2b", "student": "B", "text": "{B}'s ticket was fully correct.", "relevant": true },
+        { "id": "o2c", "student": null, "text": "The tickets are printed on yellow paper.", "relevant": false }
+      ],
+      "options": [
+        { "id": "data", "move": "review-ticket-data", "target": "all", "score": { "5": 4, "2": 4 },
+          "phrasings": ["\"Tuesday's tickets showed the same trap twice: moving a number across the equals sign. Let's look at one together.\"", "\"Last time, two of you hit the same sign issue on the ticket. Quick review on that first.\""],
+          "response": "{A} recognizes his own ticket and leans in. {C} looks at the example." },
+        { "id": "vague", "move": "vague-review", "target": "all", "score": { "5": 2, "2": 3 },
+          "phrasings": ["\"Let's keep working on equations like last time.\"", "\"Same kind of stuff as last week.\""],
+          "response": "Nobody reacts much. {A} is already on the next page." },
+        { "id": "skip", "move": "skip-review", "target": "all", "score": { "5": 1, "2": 2 },
+          "phrasings": ["\"Let's skip the review and get straight to new problems.\"", "\"No need to look back, let's move on.\""],
+          "response": "{A} nods. The ticket stack stays face down." }
+      ]
+    },
+    {
+      "id": "m3", "clock": "11:00", "block": "guided", "context": "error", "domain": 3, "targetFrom": "error",
+      "board": "{err.problem}",
+      "work": { "A": ["Guided practice", "{err.problem}"], "B": ["Guided practice", "{err.problem}"], "C": ["Guided practice", "{err.problem}"], "E": ["Guided practice", "{err.problem}", "{err.work}"] },
+      "scene": "Guided practice. On {err.problem}, {E} wrote \"{err.work}\" and is waiting for you to say whether it's right.",
+      "observations": [
+        { "id": "o3a", "student": "E", "text": "{E}'s worksheet line reads \"{err.work}\".", "relevant": true },
+        { "id": "o3b", "student": "E", "text": "{E} is looking at you, not at the worksheet.", "relevant": true },
+        { "id": "o3c", "student": null, "text": "Someone in the hallway is laughing.", "relevant": false }
+      ],
+      "options": [
+        { "id": "probe", "move": "probing-question", "target": "error", "score": { "3": 4 },
+          "phrasings": ["\"{err.probe}\"", "\"Talk me through that line. {err.probe}\""],
+          "response": "{E} looks back at the worksheet, frowns, then erases the line and rewrites it." },
+        { "id": "partial", "move": "hint-ladder", "target": "error", "score": { "3": 2 },
+          "phrasings": ["\"{err.partialStep}\"", "\"Here's the first step: {err.partialStep}\""],
+          "response": "{E} copies the step down without looking up." },
+        { "id": "label", "move": "name-misconception", "target": "error", "score": { "3": 1 },
+          "phrasings": ["\"{err.label}\"", "\"Classic mistake. {err.label}\""],
+          "response": "{E} goes quiet and erases everything on the line." },
+        { "id": "tell", "move": "tell-answer", "target": "error", "score": { "3": 1 },
+          "phrasings": ["\"{err.answer}\"", "\"Almost. {err.answer}\""],
+          "response": "{E} writes the answer down and waits for the next problem." }
+      ]
+    },
+    {
+      "id": "m4", "clock": "14:00", "block": "guided", "context": "group-question", "domain": 3,
+      "board": "4x + 7 = 23",
+      "work": { "A": ["4x + 7 = 23"], "B": ["4x + 7 = 23", "−7 both sides?"], "C": ["4x + 7 = 23"] },
+      "scene": "You write 4x + 7 = 23 on the whiteboard and want to ask the group for a first step.",
+      "observations": [
+        { "id": "o4a", "student": "A", "text": "{A}'s hand is already halfway up.", "relevant": true },
+        { "id": "o4b", "student": "B", "text": "{B} is writing something small in the margin.", "relevant": true },
+        { "id": "o4c", "student": "C", "text": "{C} is looking at the window.", "relevant": false }
+      ],
+      "options": [
+        { "id": "ask-wait", "move": "probing-question", "target": "all", "score": { "3": 4 }, "scoreRushed": { "3": 2 }, "wait": true,
+          "phrasings": ["\"What's a good first step here? Take a moment, everyone.\"", "\"Look at 4x + 7 = 23. What would you do first? I'll give you a few seconds.\""],
+          "response": { "waited": "After a few seconds of quiet, {B} says, \"Subtract 7 from both sides?\" {A} lowers his hand.", "rushed": "{A} answers at once: \"Minus seven!\" {B} stops writing." } },
+        { "id": "volunteer", "move": "call-on-volunteer", "target": "A", "score": { "3": 2, "1": 2 },
+          "phrasings": ["\"Yes, {A}?\"", "\"Go ahead, {A}.\""],
+          "response": "{A} answers correctly. {B} puts her pencil down. {C} keeps looking at the window." },
+        { "id": "self", "move": "answer-yourself", "target": "all", "score": { "3": 1 },
+          "phrasings": ["\"So first we subtract 7 from both sides, right?\"", "\"The first step is to subtract 7. Everyone got that?\""],
+          "response": "{A} says \"Yeah.\" {B} and {C} copy it down." }
+      ]
+    },
+    {
+      "id": "m5", "clock": "16:30", "block": "guided", "context": "interruption", "domain": 1,
+      "scene": "{B} starts quietly: \"I think you take the 7 from—\" {A} cuts in: \"Just do 23 minus 7, that's 16, then divide, x is 4!\"",
+      "observations": [
+        { "id": "o5a", "student": "B", "text": "{B} stopped mid-sentence and looked down.", "relevant": true },
+        { "id": "o5b", "student": "A", "text": "{A}'s answer is correct.", "relevant": true },
+        { "id": "o5c", "student": "A", "text": "{A} is tapping his pencil on the table.", "relevant": false }
+      ],
+      "options": [
+        { "id": "redirect", "move": "redirect-invite", "target": "B", "score": { "1": 4 },
+          "phrasings": ["\"Hold that thought, {A}. {B}, you were saying you take the 7 from... where?\"", "\"{A}, I want to hear yours next. {B}, finish your idea first.\""],
+          "response": "{B} looks up and finishes: \"...from both sides, so it stays balanced.\"" },
+        { "id": "let", "move": "let-finish", "target": "A", "score": { "1": 1 },
+          "phrasings": ["\"Nice, {A}, that's right.\"", "\"Yep, {A} got it.\""],
+          "response": "{A} grins. {B} erases her margin note." },
+        { "id": "move-on", "move": "move-on", "target": "all", "score": { "1": 2 },
+          "phrasings": ["\"Okay, x is 4. Next problem.\"", "\"Good, let's move on.\""],
+          "response": "The group moves on. {B} doesn't finish her sentence." }
+      ]
+    },
+    {
+      "id": "m6", "clock": "20:00", "block": "independent", "context": "frustration", "domain": 4, "target": "C",
+      "board": "5x + 3 = 2x + 12",
+      "work": { "A": ["5x + 3 = 2x + 12", "3x = 9", "x = 3"], "B": ["5x + 3 = 2x + 12", "3x + 3 = 12", "3x = 9", "x = 3"], "C": ["5x + 3 = 2x + 12", "3x + 3 = 12", "3x = 12", "x = 4 ?"] },
+      "scene": "Independent try: 5x + 3 = 2x + 12. {C} has tried the same step three times, subtracting 3 on only one side each time, and pushes the worksheet away: \"I'm bad at math.\"",
+      "observations": [
+        { "id": "o6a", "student": "C", "text": "{C} has erased the same line three times.", "relevant": true },
+        { "id": "o6b", "student": "C", "text": "{C} pushed the worksheet away and is looking down.", "relevant": true },
+        { "id": "o6c", "student": "B", "text": "{B} has finished and is checking her work.", "relevant": false }
+      ],
+      "options": [
+        { "id": "worked", "move": "worked-example", "target": "C", "score": { "4": 4, "3": 4 },
+          "phrasings": ["\"This one's stubborn, and that's okay. Let me show you a similar one all the way through: 4x + 2 = x + 11.\"", "\"Lots of people get stuck right here. Watch me do one like it, then you'll try yours again.\""],
+          "response": "{C} pulls the worksheet back and watches you work the example. Then {C} tries the original again." },
+        { "id": "specific", "move": "specific-feedback", "target": "C", "score": { "4": 3 },
+          "phrasings": ["\"You got the 2x to the left side correctly. That part is right. The +3 is next.\"", "\"Your first move, getting the x's on one side, is exactly right.\""],
+          "response": "{C} looks at the line you pointed to and picks up the pencil." },
+        { "id": "ladder", "move": "hint-ladder", "target": "C", "score": { "4": 2, "3": 2 },
+          "phrasings": ["\"Try once more. What could you do to both sides?\"", "\"Here's a hint: think about both sides again.\""],
+          "response": "{C} shrugs and doesn't pick up the pencil." },
+        { "id": "full", "move": "full-solution", "target": "C", "score": { "4": 1, "3": 1 },
+          "phrasings": ["\"Here, it's 3x = 9, so x = 3. Write that down.\"", "\"I'll just do it: x = 3.\""],
+          "response": "{C} writes \"x = 3\" and says nothing." },
+        { "id": "praise", "move": "generic-praise", "target": "C", "score": { "4": 1 },
+          "phrasings": ["\"You're doing great! Keep trying!\"", "\"Don't say that, you're good at math!\""],
+          "response": "{C} mutters \"No I'm not\" and looks away." }
+      ]
+    },
+    {
+      "id": "m7", "clock": "23:30", "block": "independent", "context": "correct", "domain": 4, "target": "B",
+      "board": "6 = 2(y + 1)",
+      "work": { "B": ["6 = 2(y + 1)", "6 = 2y + 2", "4 = 2y", "y = 2"] },
+      "scene": "{B} quietly shows you her answer to 6 = 2(y + 1): y = 2. It's correct, and her work is neat.",
+      "observations": [
+        { "id": "o7a", "student": "B", "text": "{B}'s work shows 6 = 2y + 2, then 4 = 2y, then y = 2.", "relevant": true },
+        { "id": "o7b", "student": "B", "text": "{B} is watching your face for a reaction.", "relevant": true },
+        { "id": "o7c", "student": "A", "text": "{A} is drawing in the margin.", "relevant": false }
+      ],
+      "options": [
+        { "id": "why", "move": "confirm-ask-why", "target": "B", "score": { "4": 4, "3": 4 }, "scoreRushed": { "4": 3, "3": 2 }, "wait": true,
+          "phrasings": ["\"That's right, y = 2. Why did you multiply out the 2 first?\"", "\"Correct. How did you know to distribute before anything else?\""],
+          "response": { "waited": "{B} thinks, then says, \"Because the 2 multiplies everything in the bracket, so I had to do that before taking anything away.\"", "rushed": "Before {B} can answer, you start explaining it yourself. She nods." } },
+        { "id": "similar", "move": "similar-problem", "target": "B", "score": { "4": 3 },
+          "phrasings": ["\"Right. Want to try one with a twist? 10 = 2(y − 3).\"", "\"Correct. Here's one with the same shape: 15 = 3(y + 2). Want to try it?\""],
+          "response": "{B} nods and starts the new problem." },
+        { "id": "praise", "move": "generic-praise", "target": "B", "score": { "4": 2 },
+          "phrasings": ["\"Good job!\"", "\"Great work, {B}!\""],
+          "response": "{B} smiles slightly and waits for the next thing." }
+      ]
+    },
+    {
+      "id": "m8", "clock": "27:00", "block": "exit", "context": "time-check", "domain": 2, "camera": "clock",
+      "board": "Exit ticket",
+      "scene": "Three minutes left. {A} has a question about a harder problem. The exit tickets are still in your folder.",
+      "observations": [
+        { "id": "o8a", "student": null, "text": "The clock says three minutes are left.", "relevant": true },
+        { "id": "o8b", "student": "A", "text": "{A} wants to try a harder problem.", "relevant": true },
+        { "id": "o8c", "student": "C", "text": "{C}'s hood is down now.", "relevant": false }
+      ],
+      "options": [
+        { "id": "ticket", "move": "give-exit-ticket", "target": "all", "score": { "2": 4, "5": 4 },
+          "phrasings": ["\"Great question, {A}. Write it on your ticket and we'll start with it Thursday. Exit tickets now.\"", "\"Hold that one for Thursday. Exit ticket time: three minutes.\""],
+          "response": "Everyone does the exit ticket. You collect all three, including {C}'s half-finished one." },
+        { "id": "one-more", "move": "similar-problem", "target": "A", "score": { "2": 2, "5": 2 },
+          "phrasings": ["\"Okay, one more quick problem first.\"", "\"Let's squeeze in one more, then the ticket.\""],
+          "response": "The extra problem takes longer than planned. The exit ticket gets one rushed minute." },
+        { "id": "skip", "move": "skip-exit-ticket", "target": "all", "score": { "2": 1, "5": 1 },
+          "phrasings": ["\"Let's finish this problem. We'll do the ticket next time.\"", "\"No time for the ticket today.\""],
+          "response": "The session ends on the problem. No exit tickets are collected." }
+      ]
+    }
+  ]
+}
