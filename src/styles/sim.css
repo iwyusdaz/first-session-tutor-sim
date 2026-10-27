@@ -6,12 +6,24 @@
   top: 6.2rem; right: 0.8rem; bottom: 0.8rem;
   width: min(30rem, 46vw);
   overflow-y: auto;
-  background: color-mix(in srgb, var(--surface) 95%, transparent);
+  /* Opaque: muted text must keep 4.5:1 against the panel, whatever the 3D scene behind it shows (A8). */
+  background: var(--surface);
   border: 1px solid color-mix(in srgb, var(--muted) 35%, transparent);
   border-radius: 10px;
-  padding: 0.8rem 1rem;
+  padding: 0.8rem 1rem 0;
   z-index: 6;
 }
+/* Keep the primary action ("Say it" / wait buttons) visible without scrolling
+   the panel (visual V11 / heuristics H7 / walkthrough CW4). */
+.say-bar {
+  position: sticky;
+  bottom: 0;
+  margin: 0.5rem -1rem 0;
+  padding: 0.5rem 1rem 0.8rem;
+  background: var(--surface);
+  border-top: 1px solid color-mix(in srgb, var(--muted) 30%, transparent);
+}
+.say-bar button.primary { margin-top: 0; width: 100%; }
 .side-panel[hidden] { display: none; }
 .textmode[hidden] { display: none; }
 
@@ -76,4 +88,8 @@ button.primary { background: var(--accent-strong); border-color: var(--accent-st
 
 @media (max-width: 760px) {
   .side-panel { top: auto; left: 0.4rem; right: 0.4rem; bottom: 0.4rem; width: auto; max-height: 55vh; }
+}
+/* Small screens / heavy zoom: the panel takes the full width instead of covering the scene (A3 reflow). */
+@media (max-width: 640px) {
+  .side-panel { position: static; width: auto; margin: 0.4rem; max-height: none; }
 }

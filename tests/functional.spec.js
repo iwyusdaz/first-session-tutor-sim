@@ -143,7 +143,7 @@ test('timed wait: speaking again too soon counts as not waiting', async ({ page 
   await expect(page.locator('.wait-note')).toHaveText('You spoke again quickly.');
 });
 
-test('reduced motion: the intro cinematic shows stills with captions and skips', async ({ browser }) => {
+test('reduced motion: the intro cinematic shows stills with captions and a continue control', async ({ browser }) => {
   const context = await browser.newContext({ reducedMotion: 'reduce' });
   const page = await context.newPage();
   await page.goto('/');
@@ -154,7 +154,9 @@ test('reduced motion: the intro cinematic shows stills with captions and skips',
   if (await page.locator('canvas').count()) {
     await expect(overlay).toBeVisible();
     await expect(overlay.locator('.cinematic-caption')).toContainText('first session');
-    await overlay.getByRole('button', { name: /Skip cinematic/ }).click();
+    // Reduced motion shows stills with a Continue control; leaving a still is not logged as a skip.
+    await expect(overlay.getByRole('button', { name: 'Continue' })).toBeVisible();
+    await overlay.getByRole('button', { name: 'Continue' }).click();
     await expect(overlay).toBeHidden();
   }
   await expect(page.locator('#moment-h')).toContainText('Moment 1 of 8');

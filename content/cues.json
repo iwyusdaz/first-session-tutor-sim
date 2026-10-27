@@ -1,7 +1,8 @@
 {
   "_meta": {
-    "label": "Simplified teaching model: how a student's state shows up in posture, gaze and hand activity. Cues come from engagement (e) and confidence (c); understanding (u) shows only in their written work.",
-    "faces": "Faces stay subtle (no expressions beyond a slight head tilt) and there is no lip sync; dialogue is shown as captions. See design/character-design.md."
+    "label": "Simplified teaching model: how a student's state shows up in posture, gaze and hand activity. Cues come from engagement (e), confidence (c) and understanding (u); moments can pin a body-language cue for their target student (see cuePose in session.json). Relevant observations that describe body language carry an 'expects' note, and the validator checks them against these cues on the default path (validate-rules.mjs).",
+    "faces": "Faces stay subtle (no expressions beyond a slight head tilt) and there is no lip sync; dialogue is shown as on-screen text. See design/character-design.md.",
+    "extraHands": "extras.hands holds override-only hand cues (no state thresholds); they apply only where a moment's cuePose names them."
   },
   "posture": [
     { "id": "engaged", "when": { "eMin": 3 }, "lean": 0.18, "headPitch": 0.2, "description": "leaning in toward the table" },
@@ -9,14 +10,20 @@
     { "id": "withdrawn", "when": { "eMax": 1 }, "lean": -0.22, "headPitch": -0.08, "description": "slumped back in the chair" }
   ],
   "gaze": [
-    { "id": "on-work", "when": { "eMin": 3 }, "target": "worksheet", "description": "looking at the worksheet" },
+    { "id": "on-work", "when": { "eMin": 3 }, "target": "worksheet", "description": "looking down at the worksheet" },
     { "id": "on-tutor", "when": { "eMin": 2, "eMax": 2 }, "target": "tutor", "description": "looking at you" },
     { "id": "away", "when": { "eMax": 1 }, "target": "window", "description": "looking toward the window" }
   ],
   "hands": [
+    { "id": "confused", "when": { "uMax": 1, "eMin": 2 }, "action": "confused", "description": "pencil hovering, stuck on the line" },
     { "id": "hand-up", "when": { "eMin": 4, "cMin": 3 }, "action": "raise", "description": "hand up, ready to answer" },
     { "id": "writing", "when": { "eMin": 2, "cMin": 2 }, "action": "write", "description": "writing" },
     { "id": "pencil-down", "when": { "eMin": 2, "cMax": 1 }, "action": "still", "description": "pencil down, not writing" },
     { "id": "arms-folded", "when": { "eMax": 1 }, "action": "fold", "description": "arms folded" }
-  ]
+  ],
+  "extras": {
+    "hands": [
+      { "id": "waiting", "action": "waiting", "description": "pencil in hand, not writing" }
+    ]
+  }
 }

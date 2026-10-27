@@ -4,8 +4,8 @@
  */
 import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
-import { loadData, validate } from '../../scripts/validate-rules.mjs';
-import { createRun, choose, scoreRun, cuesFor, waitedEnough, fill } from '../../src/systems/student-model.js';
+import { loadData, validate, DEFAULT_PATH } from '../../scripts/validate-rules.mjs';
+import { createRun, choose, currentMoment, scoreRun, cuesFor, studentCues, waitedEnough, fill } from '../../src/systems/student-model.js';
 
 const data = loadData();
 
@@ -137,6 +137,46 @@ describe('cues', () => {
     expect(low.gaze.id).toBe('away');
     expect(high.posture.id).toBe('engaged');
     expect(high.hands.id).toBe('hand-up');
+  });
+  it('shows a confused cue for low understanding with engagement still present', () => {
+    const stuck = cuesFor({ u: 1, e: 3, c: 2 }, data.cues);
+    expect(stuck.hands.id).toBe('confused');
+    const fine = cuesFor({ u: 2, e: 3, c: 2 }, data.cues);
+    expect(fine.hands.id).toBe('writing');
+    const shutDown = cuesFor({ u: 1, e: 0, c: 0 }, data.cues);
+    expect(shutDown.hands.id).toBe('arms-folded');
+  });
+  it('relevant body-language observations agree with the rendered cues on the default path, in both mixes', () => {
+    for (const mix of data.mixes.mixes) {
+      const run = createRun(data, mix.id);
+      for (const m of data.session.moments) {
+        for (const o of m.observations) {
+          if (!o.relevant || !o.expects) continue;
+          for (const [key, want] of Object.entries(o.expects)) {
+            const id = key === 'E' ? mix.error.student : key;
+            const c = studentCues(data, run, id, m);
+            const got = { posture: c.posture.id, gaze: c.gaze.id, hands: c.hands.action };
+            for (const dim of ['posture', 'gaze', 'hands']) {
+              if (want[dim]) expect(got[dim], `${mix.id}/${m.id}/${o.id} ${id}.${dim}`).toBe(want[dim]);
+            }
+          }
+        }
+        choose(data, run, DEFAULT_PATH[m.id], { seconds: 4 });
+      }
+    }
+  });
+  it('moment cuePose overrides reach both the 3D pose and the written description', () => {
+    const run = createRun(data, 'quiet');
+    for (const id of ['greet', 'data']) choose(data, run, id, { seconds: 4 });
+    // At m3 the error student is pinned to "waiting for you" even though engagement says worksheet-gaze.
+    const m3 = currentMoment(data, run);
+    const errId = run.mix.error.student;
+    const c = studentCues(data, run, errId, m3);
+    expect(c.gaze.id).toBe('on-tutor');
+    expect(c.hands.action).toBe('waiting');
+    // A non-target student keeps pure state-derived cues.
+    const other = studentCues(data, run, 'C', m3);
+    expect(other.hands.action).not.toBe('waiting');
   });
 });
 

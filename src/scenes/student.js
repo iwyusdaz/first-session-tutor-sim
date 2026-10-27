@@ -121,7 +121,11 @@ export class Student {
     this.group.updateMatrixWorld(true);
     const local = this.group.worldToLocal(gazeWorld.clone());
     const yaw = Math.atan2(local.x, local.z);
-    this.target = { lean: cues.posture.lean, headPitch: cues.posture.headPitch, yaw: THREE.MathUtils.clamp(yaw, -1.0, 1.0), action: cues.hands.action };
+    // Head pitch aims at the gaze point from the head, so "looking down at the
+    // worksheet" and "looking at you" differ visibly at session distance (V9).
+    const neckLocal = this.group.worldToLocal(this.neck.getWorldPosition(new THREE.Vector3()));
+    const pitch = Math.atan2(local.y - neckLocal.y, Math.hypot(local.x - neckLocal.x, local.z - neckLocal.z));
+    this.target = { lean: cues.posture.lean, headPitch: THREE.MathUtils.clamp(pitch, -0.45, 0.35), yaw: THREE.MathUtils.clamp(yaw, -1.0, 1.0), action: cues.hands.action };
     if (snap) this.pose = { ...this.target };
   }
 
@@ -131,7 +135,15 @@ export class Student {
       // Upper arm forward-down (~-0.95) plus elbow ~-0.62 puts the forearm level on the table.
       case 'raise': return side === 1 ? [-2.8, -0.15, -0.2] : [-0.95, -0.08, -0.62];
       case 'write': return side === 1 ? [-1.0, 0.05, -0.6 + Math.sin(t * 9) * 0.06] : [-1.05, -0.05, -0.55];
-      case 'fold': return side === 1 ? [-0.45, 0.6, -1.9] : [-0.45, -0.6, -1.9];
+      // Confused: pencil hovering over the line, slight tremble, other arm resting.
+      case 'confused': return side === 1 ? [-1.15, 0.08, -1.0 + Math.sin(t * 2.2) * 0.05] : [-0.95, -0.08, -0.62];
+      // Waiting: pencil held still in the lap-side hand, no writing motion.
+      case 'waiting': return side === 1 ? [-0.95, 0.08, -0.75] : [-0.95, -0.08, -0.62];
+      // Arms folded: shoulder pulls the upper arm inward and slightly forward
+      // (X ~ -0.3, Z toward the midline) and the elbow folds the forearm across
+      // the chest, so the hands rest on the opposite upper arm — read as crossed
+      // arms from the tutor seat, not raised fists.
+      case 'fold': return side === 1 ? [-0.3, -0.5, -1.5] : [-0.3, 0.5, -1.5];
       default: return side === 1 ? [-0.95, 0.08, -0.62] : [-0.95, -0.08, -0.62];
     }
   }
@@ -146,6 +158,8 @@ export class Student {
 
     const breathe = reduced ? 0 : Math.sin(this.t * 1.6) * 0.006;
     this.spine.rotation.x = this.pose.lean;
+    // A slight torso yaw toward the gaze target makes head direction readable (V9).
+    this.spine.rotation.y = 0.3 * this.pose.yaw;
     this.spine.position.y = breathe;
     this.neck.rotation.set(this.pose.headPitch + (this.pose.action === 'write' ? 0.2 : 0), this.pose.yaw, 0);
     for (const side of [-1, 1]) {

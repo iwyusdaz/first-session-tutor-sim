@@ -6,7 +6,7 @@
  * student's body language (plan 07 §11).
  * @module ui/session-panel
  */
-import { fill, currentMoment, choose, resolveTarget, cuesFor, WAIT_TARGET_SECONDS, STUDENT_IDS } from '../systems/student-model.js';
+import { fill, currentMoment, choose, resolveTarget, studentCues, WAIT_TARGET_SECONDS, STUDENT_IDS } from '../systems/student-model.js';
 import { announce } from '../a11y/announcer.js';
 
 /** Tiny element helper. `text` sets textContent; `on*` attaches listeners. */
@@ -30,10 +30,11 @@ export function targetLabel(data, mix, target) {
   return !t || t === 'all' ? 'the group' : studentName(data, t);
 }
 
-/** Plain-language body language for each student, from content/cues.json. */
-export function describeStudents(data, students) {
+/** Plain-language body language for each student, from content/cues.json (with the moment's cuePose overrides). */
+export function describeStudents(data, run) {
+  const m = currentMoment(data, run);
   return STUDENT_IDS.map((id) => {
-    const c = cuesFor(students[id], data.cues);
+    const c = studentCues(data, run, id, m);
     return `${studentName(data, id)} is ${c.posture.description}, ${c.gaze.description}, ${c.hands.description}.`;
   });
 }
@@ -67,14 +68,19 @@ export function renderMoment(app, container, { textMode }) {
     h('p', { class: 'scene-text', text: f(m.scene) }),
     h('details', { class: 'cue-desc', open: textMode || null },
       h('summary', { text: 'Describe what each student is doing' }),
-      h('ul', {}, describeStudents(data, run.students).map((t) => h('li', { text: t })))),
+      h('ul', {}, describeStudents(data, run).map((t) => h('li', { text: t })))),
   );
 
   if (app.engine && !textMode) {
     const looks = h('div', { class: 'look-buttons', role: 'group', 'aria-label': 'Look at' });
-    for (const v of ['group', 'A', 'B', 'C', 'board', 'clock']) {
-      const label = v === 'group' ? 'Look at the whole group' : v.length === 1 ? `Look at ${studentName(data, v)}` : `Look at the ${v}`;
-      looks.append(h('button', { type: 'button', text: label, onclick: () => app.lookAt(v) }));
+    const lookLabel = (v) => {
+      if (v === 'group') return 'Look at the whole group';
+      if (v.endsWith('-work')) return `Look at ${studentName(data, v[0])}'s worksheet`;
+      if (v.length === 1) return `Look at ${studentName(data, v)}`;
+      return `Look at the ${v}`;
+    };
+    for (const v of ['group', 'A', 'A-work', 'B', 'B-work', 'C', 'C-work', 'board', 'clock']) {
+      looks.append(h('button', { type: 'button', text: lookLabel(v), onclick: () => app.lookAt(v) }));
     }
     wrap.append(looks);
   }
@@ -111,12 +117,14 @@ export function renderMoment(app, container, { textMode }) {
 
   const result = h('div', { class: 'result' });
   const say = h('button', { type: 'button', class: 'primary', text: 'Say it' });
-  wrap.append(say, result);
+  const sayBar = h('div', { class: 'say-bar' }, say);
+  wrap.append(sayBar, result);
   container.append(wrap);
 
   const lock = () => {
     for (const el of wrap.querySelectorAll('fieldset input, fieldset select')) el.disabled = true;
     say.disabled = true;
+    sayBar.hidden = true; // the decision is made; the wait prompt and reaction replace it
   };
 
   const commit = (o, idx, wait) => {
@@ -128,7 +136,7 @@ export function renderMoment(app, container, { textMode }) {
     result.replaceChildren(h('p', { class: 'said', text: `You: ${entry.phrasing}` }));
     if (entry.waited !== null) result.append(h('p', { class: 'wait-note', text: entry.waited ? 'You held the silence.' : 'You spoke again quickly.' }));
     result.append(h('p', { class: 'reaction', text: reaction }));
-    if (textMode) result.append(h('ul', { class: 'cue-after', 'aria-label': 'What the students are doing now' }, describeStudents(data, run.students).map((t) => h('li', { text: t }))));
+    if (textMode) result.append(h('ul', { class: 'cue-after', 'aria-label': 'What the students are doing now' }, describeStudents(data, run).map((t) => h('li', { text: t }))));
     const next = h('button', { type: 'button', class: 'primary', id: 'next-moment', text: run.done ? 'End the session' : 'Next moment', onclick: () => app.nextMoment() });
     result.append(next);
     announce(reaction);

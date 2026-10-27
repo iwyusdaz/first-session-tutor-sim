@@ -17,7 +17,7 @@ import { MotionPrefs } from './a11y/motion.js';
 import { announce } from './a11y/announcer.js';
 import { ShotPlayer } from './cinematics/shot-player.js';
 import { TutoringRoom, VIEWS } from './scenes/tutoring-room.js';
-import { createRun, choose, currentMoment, cuesFor, fill, scoreRun, STUDENT_IDS } from './systems/student-model.js';
+import { createRun, choose, currentMoment, studentCues, fill, scoreRun, STUDENT_IDS } from './systems/student-model.js';
 import { renderMoment } from './ui/session-panel.js';
 import { renderDebrief } from './ui/debrief.js';
 import { renderIntro, renderRunPicker, renderAfter } from './ui/modules.js';
@@ -149,6 +149,7 @@ export class App {
     applyPreset(this.engine.quality.presetDef);
     this.engine.quality.onChange(applyPreset);
     this.player = new ShotPlayer({ container: document.getElementById('cinematic-host'), camera: this.engine.camera, motion: this.motion,
+      captions: () => this.settings?.state.captions !== false,
       onSkip: (id) => this.record.log('experienced', { id: `cinematic-${id}-skipped`, name: 'Cinematic skipped' }) });
     this._cam = { pos: new THREE.Vector3(...VIEWS.group.pos), look: new THREE.Vector3(...VIEWS.group.look) };
     this._camTarget = null;
@@ -182,7 +183,9 @@ export class App {
 
   _applyStudents(students, { snap = false } = {}) {
     if (!this.room) return;
-    for (const id of STUDENT_IDS) this.room.setStudentState(id, students[id], cuesFor(students[id], this.data.cues), { snap });
+    const moment = this.state.run ? currentMoment(this.data, this.state.run) : null;
+    const runLike = { students, mix: this.state.run?.mix ?? this.data.mixes.mixes[0] };
+    for (const id of STUDENT_IDS) this.room.setStudentState(id, students[id], studentCues(this.data, runLike, id, moment), { snap });
   }
 
   /** Board, clock and worksheets for a moment (index into session.moments). */
@@ -279,6 +282,16 @@ export class App {
     if (moment.id === 'm3' && this.room && ['probe', 'partial', 'tell'].includes(entry.optionId)) {
       this.room.setWork(errId, ['Guided practice', fill(moment.board, this.data, this.state.run.mix), ...this.state.run.mix.error.fixed], { mark: 'fixed' });
     }
+    // Signal who changed in the HUD region (multimedia MP3): a short text summary
+    // of the state deltas, alongside the pose change. Not announced (the reaction
+    // text already carries the news to screen readers).
+    const DIM = { u: 'understanding', e: 'engagement', c: 'confidence' };
+    const nameOf = (id) => this.data.mixes.students[id]?.name ?? id;
+    const changes = entry.applied.flatMap((a) => a.changes);
+    const hud = changes.length
+      ? changes.map((c) => `${nameOf(c.student)}: ${DIM[c.dim]} ${c.from}→${c.to}`).join(' · ')
+      : 'No change in the students\' states.';
+    this.shell.setStatus(hud, { announce: false });
     const mv = this.data.moves.moves.find((m) => m.id === entry.move);
     this.record.log('answered', { id: `${this.state.run.mixId}-${moment.id}`, name: `${moment.clock} ${mv.name}` },
       { response: entry.optionId, extensions: { waited: entry.waited, score: entry.score } });
@@ -296,6 +309,11 @@ export class App {
     }
     this._stageMoment(run.index, run.mix);
     const m = currentMoment(this.data, run);
+    // Keep the time-box cue visible at the decision too (realism R-C6): the session
+    // clock and the current routine block stay in the HUD even when the 3D clock is
+    // out of frame behind the panel.
+    const block = this.data.session.routine.find((b) => b.id === m.block);
+    this.shell.setStatus(`${m.clock} · ${block.name}`, { announce: false });
     const show = () => { this.lookAt('group', { snap: true }); this.render(); };
     if (m.camera === 'clock' && !skipCinematic) this._play('timeCheck', show);
     else show();

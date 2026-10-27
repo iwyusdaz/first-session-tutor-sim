@@ -156,7 +156,34 @@ export function scoreRun(run) {
 /** Cue descriptions for one student's state (posture, gaze, hands). */
 export function cuesFor(state, cues) {
   const fits = (w) => (w.eMin === undefined || state.e >= w.eMin) && (w.eMax === undefined || state.e <= w.eMax)
-    && (w.cMin === undefined || state.c >= w.cMin) && (w.cMax === undefined || state.c <= w.cMax);
+    && (w.cMin === undefined || state.c >= w.cMin) && (w.cMax === undefined || state.c <= w.cMax)
+    && (w.uMin === undefined || state.u >= w.uMin) && (w.uMax === undefined || state.u <= w.uMax);
   const pick = (list) => list.find((x) => fits(x.when)) || list[list.length - 1];
   return { posture: pick(cues.posture), gaze: pick(cues.gaze), hands: pick(cues.hands) };
+}
+
+const findCue = (list, id) => list.find((x) => x.id === id) || null;
+
+/**
+ * Cues for one student at a moment: the state-derived cues, overridden where the
+ * moment pins a body-language cue (moment.cuePose in session.json). cuePose keys
+ * are a student id or "target" (the moment's target or error student); values are
+ * partial { posture, gaze, hands } naming cue ids from cues.json. Used by both the
+ * 3D poses (app._applyStudents) and the written cue descriptions (session panel),
+ * so the render and the text can never disagree about these.
+ */
+export function studentCues(data, run, id, moment) {
+  let c = cuesFor(run.students[id], data.cues);
+  const pose = moment?.cuePose;
+  if (pose) {
+    for (const [key, ov] of Object.entries(pose)) {
+      const sid = key === 'target' ? resolveTarget(moment.targetFrom ?? moment.target, run.mix) : key;
+      if (sid !== id) continue;
+      if (ov.posture && findCue(data.cues.posture, ov.posture)) c = { ...c, posture: findCue(data.cues.posture, ov.posture) };
+      if (ov.gaze && findCue(data.cues.gaze, ov.gaze)) c = { ...c, gaze: findCue(data.cues.gaze, ov.gaze) };
+      const hands = [...data.cues.hands, ...(data.cues.extras?.hands || [])];
+      if (ov.hands && findCue(hands, ov.hands)) c = { ...c, hands: findCue(hands, ov.hands) };
+    }
+  }
+  return c;
 }

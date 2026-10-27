@@ -31,8 +31,8 @@
       "description": "Talia barely speaks unless given room. Jordan answers first. Sam is wary from the start.",
       "initial": {
         "A": { "u": 2, "e": 3, "c": 3 },
-        "B": { "u": 3, "e": 1, "c": 1 },
-        "C": { "u": 1, "e": 2, "c": 1 }
+        "B": { "u": 3, "e": 2, "c": 1 },
+        "C": { "u": 1, "e": 1, "c": 1 }
       },
       "error": {
         "student": "A",
@@ -53,7 +53,7 @@
       "initial": {
         "A": { "u": 2, "e": 4, "c": 4 },
         "B": { "u": 3, "e": 2, "c": 2 },
-        "C": { "u": 2, "e": 2, "c": 2 }
+        "C": { "u": 2, "e": 1, "c": 1 }
       },
       "error": {
         "student": "C",

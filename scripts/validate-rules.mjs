@@ -14,7 +14,7 @@
 import { readFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { createRun, choose, fill, STUDENT_IDS, STATE_MIN, STATE_MAX } from '../src/systems/student-model.js';
+import { createRun, choose, fill, studentCues, STUDENT_IDS, STATE_MIN, STATE_MAX } from '../src/systems/student-model.js';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const read = (f) => JSON.parse(readFileSync(join(root, 'content', f), 'utf8'));
@@ -28,6 +28,39 @@ export function loadData() {
     notes: read('coach-notes.json'),
     cues: read('cues.json'),
   };
+}
+
+/**
+ * The teaching demo path: the choices a careful, competent tutor makes. Used by the
+ * cue-agreement check below: relevant observations that describe body language
+ * carry an "expects" note ({studentId|"E": {posture, gaze, hands}}) which must
+ * agree with the rendered cues (cues.json via studentCues, including the moment's
+ * cuePose overrides) at that point on this path, in BOTH mixes. Text and render
+ * must tell the same story.
+ */
+export const DEFAULT_PATH = { m1: 'greet', m2: 'data', m3: 'probe', m4: 'ask-wait', m5: 'redirect', m6: 'worked', m7: 'why', m8: 'ticket' };
+
+function checkCueAgreement(data, errors) {
+  for (const mix of data.mixes.mixes) {
+    const run = createRun(data, mix.id);
+    for (const m of data.session.moments) {
+      for (const o of m.observations) {
+        if (!o.relevant || !o.expects) continue;
+        for (const [key, want] of Object.entries(o.expects)) {
+          const id = key === 'E' ? mix.error.student : key;
+          if (!run.students[id]) { errors.push(`${mix.id}/${m.id}/${o.id}: expects names unknown student "${key}"`); continue; }
+          const c = studentCues(data, run, id, m);
+          const got = { posture: c.posture.id, gaze: c.gaze.id, hands: c.hands.action };
+          for (const dim of ['posture', 'gaze', 'hands']) {
+            if (want[dim] && got[dim] !== want[dim]) {
+              errors.push(`${mix.id}/${m.id}/${o.id}: observation says ${id} ${dim}="${want[dim]}" but the render shows "${got[dim]}"`);
+            }
+          }
+        }
+      }
+      choose(data, run, DEFAULT_PATH[m.id], { seconds: 4 });
+    }
+  }
 }
 
 export function validate(data) {
@@ -68,6 +101,8 @@ export function validate(data) {
       }
     }
   }
+
+  checkCueAgreement(data, errors);
 
   // Exhaustive path check: every combination of options (wait options tried both ways).
   let paths = 0;

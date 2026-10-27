@@ -33,15 +33,20 @@ const TEX = {
 };
 const HDRI = 'assets/school_hall_1k-14dad2701a.hdr';
 
-/** Seated tutor camera and preset looks (positions in meters). */
+/** Seated tutor camera and preset looks (positions in meters). The group view is
+ * framed for the visible area left of the session side panel, which covers the
+ * right edge of the canvas (visual review V1 / multimedia MP5). */
 export const VIEWS = {
-  group: { pos: [0, 1.22, 1.35], look: [0, 0.82, -0.25], label: 'The whole group' },
+  group: { pos: [0.05, 1.22, 1.35], look: [0.5, 0.82, -0.3], label: 'The whole group' },
   A: { pos: [0.15, 1.2, 1.1], look: [-0.62, 0.95, -0.45], label: 'Jordan' },
   B: { pos: [0, 1.2, 1.1], look: [0, 0.95, -0.62], label: 'Talia' },
   C: { pos: [-0.15, 1.2, 1.1], look: [0.62, 0.95, -0.45], label: 'Sam' },
+  'A-work': { pos: [-0.42, 1.08, 0.08], look: [-0.62, 0.76, -0.5], label: "Jordan's worksheet" },
+  'B-work': { pos: [-0.2, 1.08, 0.08], look: [0, 0.76, -0.5], label: "Talia's worksheet" },
+  'C-work': { pos: [0.02, 1.08, 0.08], look: [0.62, 0.76, -0.5], label: "Sam's worksheet" },
   board: { pos: [0, 1.25, 1.2], look: [0, 1.45, -2.4], label: 'Whiteboard' },
   clock: { pos: [0, 1.25, 1.2], look: [1.9, 1.95, -2.4], label: 'Wall clock' },
-  overview: { pos: [0, 3.1, 2.6], look: [0, 0.7, -0.4], label: 'Overview' },
+  overview: { pos: [0, 3.1, 2.6], look: [0.5, 0.7, -0.4], label: 'Overview' },
 };
 
 function canvasTexture(w, h, draw) {
@@ -114,8 +119,25 @@ export class TutoringRoom {
     this._box(0.02, 0.1, 7, skirtMat, -3.14, 0.05, 0);
     this._box(0.02, 0.1, 7, skirtMat, 3.14, 0.05, 0);
 
-    // Window on the left wall: emissive daylight panel with mullions.
-    const glass = new THREE.Mesh(new THREE.PlaneGeometry(2.2, 1.3), new THREE.MeshStandardMaterial({ color: 0xdfeaf2, emissive: 0xcfe0ee, emissiveIntensity: 1.1 }));
+    // Window on the left wall: glass panel over a simple exterior (sky and tree
+    // line), so a gaze toward it reads as looking out (visual review V8).
+    const exterior = new THREE.Mesh(new THREE.PlaneGeometry(2.6, 1.7), new THREE.MeshBasicMaterial({ map: canvasTexture(256, 256, (g) => {
+      const sky = g.createLinearGradient(0, 0, 0, 256);
+      sky.addColorStop(0, '#9fc4dd');
+      sky.addColorStop(0.65, '#d8e8f0');
+      sky.addColorStop(0.7, '#7da05e');
+      sky.addColorStop(1, '#5c7f47');
+      g.fillStyle = sky;
+      g.fillRect(0, 0, 256, 256);
+      g.fillStyle = '#4e6f3d';
+      for (const [x, y, r] of [[30, 150, 34], [95, 138, 40], [170, 152, 36], [235, 142, 30]]) {
+        g.beginPath(); g.ellipse(x, y, r, r * 0.85, 0, 0, Math.PI * 2); g.fill();
+      }
+    }), fog: false }));
+    exterior.position.set(-3.3, 1.65, -0.6);
+    exterior.rotation.y = Math.PI / 2;
+    s.add(exterior);
+    const glass = new THREE.Mesh(new THREE.PlaneGeometry(2.2, 1.3), new THREE.MeshStandardMaterial({ color: 0xdfeaf2, emissive: 0xcfe0ee, emissiveIntensity: 0.45, transparent: true, opacity: 0.55 }));
     glass.position.set(-3.14, 1.65, -0.6);
     glass.rotation.y = Math.PI / 2;
     s.add(glass);
@@ -145,8 +167,9 @@ export class TutoringRoom {
     s.add(clock);
     this.setClock('0:00');
 
-    // Table (CC0 wood texture) and chairs.
-    const woodMat = pbr(TEX.table, 1, 0.5);
+    // Table (CC0 wood texture, tinted lighter/desaturated so it does not compete
+    // with the figures, which carry the cues — visual V7) and chairs.
+    const woodMat = pbr(TEX.table, 1, 0.5, { color: 0xcfc0b2 });
     this._box(1.9, 0.04, 1.0, woodMat, 0, 0.74, -0.25);
     const legMat = new THREE.MeshStandardMaterial({ color: 0x3d4146, roughness: 0.5, metalness: 0.6 });
     for (const [x, z] of [[-0.88, -0.7], [0.88, -0.7], [-0.88, 0.2], [0.88, 0.2]]) this._box(0.04, 0.72, 0.04, legMat, x, 0.36, z);
@@ -237,6 +260,10 @@ export class TutoringRoom {
       g.lineWidth = 5;
       const y = 80 + (lines.length - 1) * 56 - 12;
       g.beginPath(); g.ellipse(250, y, 230, 30, 0, 0, Math.PI * 2); g.stroke();
+      // Shape + text, not color alone (accessibility review A7).
+      g.fillStyle = mark === 'error' ? '#c0392b' : '#2e7d4f';
+      g.font = 'bold 52px system-ui, sans-serif';
+      g.fillText(mark === 'error' ? '✗' : '✓', 16, y + 18);
     }
     ws.tex.needsUpdate = true;
   }
