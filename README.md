@@ -1,4 +1,4 @@
-> **Evaluation status:** Automated functional, accessibility and unit testing plus agent-based design reviews are complete. Headed GPU performance testing is still pending (headless frame pacing only), and no human representation review has been done. No real learners have tested this yet. No physical phone testing has been done (mobile was checked with device emulation). See `evaluation/METHODS.md`.
+> **Evaluation status:** Automated functional, accessibility and performance testing plus agent-based design reviews are complete. No human representation review has been done (recommended before use with real tutors). No real learners have tested this yet. No physical phone testing has been done (mobile was checked with device emulation). See `evaluation/METHODS.md`.
 
 # First Session: a Tutor Classroom Simulator
 
@@ -10,7 +10,7 @@ All three students are fictional, constructed for teaching purposes. Bridge Math
 
 ## Trailer
 
-[Trailer placeholder: not recorded yet. It needs a headed GPU capture, which is scheduled separately.]
+**Trailer:** [docs/trailer.webm](docs/trailer.webm) (56 s, captioned; WebVTT sidecar at [docs/trailer.vtt](docs/trailer.vtt)).
 
 ## The problem
 

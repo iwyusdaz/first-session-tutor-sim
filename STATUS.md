@@ -11,7 +11,7 @@ Statuses: **done** (verified by the builder), **done (agent review)** (pending o
 | Both student mixes completable; every outcome reachable | done | Validator walks 51,840 paths; Playwright plays both mixes end to end |
 | Cues legible at the session distance; representation review done | done (agent review) + revised | Agent reviews found the m1 cue/text mismatch, the fists-like fold pose, missing confused/waiting cues, and gender/skin-tone correlations; all fixed in the 2026-10-27 revision pass (DECISIONS.md R1-R9), with a new validator cue-agreement check. **The representation review was a simulated agent persona; no human representation review has been done and one is recommended** (`evaluation/METHODS.md`) |
 | Wait-time scale works; text mode covers every decision | done | Unit test on scale and manual wait; Playwright "timed wait" and "text mode covers the same decisions" |
-| Performance budgets met | pending | Headed GPU sampling is serialized by the orchestrator. Headless only: frame pacing keeps the UI responsive under software WebGL (DECISIONS.md D17) |
+| Performance budgets met | done (orchestrator, headed Apple M1, 2026-10-27): Medium 60 fps (budget ≥ 55), 155 draw calls, 19.5k triangles, menu interactive 0.20 s, 6.58 MB before first interaction (`evaluation/results/perf-2026-10-27.json`). Headless frame pacing (D17) keeps tests responsive under software WebGL |
 | README: play link, trailer, realism rationale, companion links, evaluation notice | done | Play link marked pending deployment; trailer is a placeholder (not possible here: needs a headed GPU capture) |
 
 ## Success criteria (plan 07 §2)
@@ -24,7 +24,7 @@ Statuses: **done** (verified by the builder), **done (agent review)** (pending o
 | Wait-time mechanic, real seconds, adjustable | done |
 | Replay debrief: timeline, state graphs, coach notes mapped to the rubric | done |
 | Two replayable runs with different student mixes | done |
-| Text mode with parity; performance budgets met | text mode done; performance pending |
+| Text mode with parity; performance budgets met | both done (headed perf: Medium 60 fps, see `evaluation/results/perf-2026-10-27.json`) |
 | Versioned release build meeting the build contract | done (untagged; tagging is the orchestrator's) |
 | All verification and reviews done; ≥ 5 revisions documented | done (agent review) for reviews; 17 documented revision fixes applied after them (DECISIONS.md revision log R1-R17); automated verification re-run green |
 
