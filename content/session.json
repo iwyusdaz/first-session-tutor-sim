@@ -17,7 +17,7 @@
       "id": "m1", "clock": "0:30", "block": "warm-up", "context": "greeting", "domain": 1,
       "board": "x + 4 = 9",
       "work": { "A": ["Warm-up", "x + 4 = 9", "x = 5"], "B": ["Warm-up", "x + 4 = 9", "x = 5"], "C": ["Warm-up", "x + 4 = 9"] },
-      "scene": "You sit down at the table. {A} is already talking about a video game. {B} has her worksheet out and her pencil ready. {C} sits back, hood up, arms folded.",
+      "scene": "You sit down at the table. {A} is already talking about a video game. {B} has her worksheet out and her pencil ready. {C} sits back with arms folded, looking toward the window.",
       "observations": [
         { "id": "o1a", "student": "C", "text": "{C} has their arms folded and hasn't looked up.", "relevant": true },
         { "id": "o1b", "student": "B", "text": "{B} is ready to work but hasn't said anything.", "relevant": true },
@@ -49,7 +49,7 @@
       "options": [
         { "id": "data", "move": "review-ticket-data", "target": "all", "score": { "5": 4, "2": 4 },
           "phrasings": ["\"Tuesday's tickets showed the same trap twice: moving a number across the equals sign. Let's look at one together.\"", "\"Last time, two of you hit the same sign issue on the ticket. Quick review on that first.\""],
-          "response": "{A} recognizes his own ticket and leans in. {C} looks at the example." },
+          "response": "{A} recognizes the ticket and leans in. {C} looks at the example." },
         { "id": "vague", "move": "vague-review", "target": "all", "score": { "5": 2, "2": 3 },
           "phrasings": ["\"Let's keep working on equations like last time.\"", "\"Same kind of stuff as last week.\""],
           "response": "Nobody reacts much. {A} is already on the next page." },
@@ -96,7 +96,7 @@
       "options": [
         { "id": "ask-wait", "move": "probing-question", "target": "all", "score": { "3": 4 }, "scoreRushed": { "3": 2 }, "wait": true,
           "phrasings": ["\"What's a good first step here? Take a moment, everyone.\"", "\"Look at 4x + 7 = 23. What would you do first? I'll give you a few seconds.\""],
-          "response": { "waited": "After a few seconds of quiet, {B} says, \"Subtract 7 from both sides?\" {A} lowers his hand.", "rushed": "{A} answers at once: \"Minus seven!\" {B} stops writing." } },
+          "response": { "waited": "After a few seconds of quiet, {B} says, \"Subtract 7 from both sides?\" {A} lowers her hand.", "rushed": "{A} answers at once: \"Minus seven!\" {B} stops writing." } },
         { "id": "volunteer", "move": "call-on-volunteer", "target": "A", "score": { "3": 2, "1": 2 },
           "phrasings": ["\"Yes, {A}?\"", "\"Go ahead, {A}.\""],
           "response": "{A} answers correctly. {B} puts her pencil down. {C} keeps looking at the window." },
@@ -111,7 +111,7 @@
       "observations": [
         { "id": "o5a", "student": "B", "text": "{B} stopped mid-sentence and looked down.", "relevant": true },
         { "id": "o5b", "student": "A", "text": "{A}'s answer is correct.", "relevant": true },
-        { "id": "o5c", "student": "A", "text": "{A} is tapping his pencil on the table.", "relevant": false }
+        { "id": "o5c", "student": "A", "text": "{A} is sitting in the chair on the left.", "relevant": false }
       ],
       "options": [
         { "id": "redirect", "move": "redirect-invite", "target": "B", "score": { "1": 4 },
@@ -157,10 +157,10 @@
       "id": "m7", "clock": "23:30", "block": "independent", "context": "correct", "domain": 4, "target": "B",
       "board": "6 = 2(y + 1)",
       "work": { "B": ["6 = 2(y + 1)", "6 = 2y + 2", "4 = 2y", "y = 2"] },
-      "scene": "{B} quietly shows you her answer to 6 = 2(y + 1): y = 2. It's correct, and her work is neat.",
+      "scene": "{B} quietly shows you her answer to 6 = 2(y + 1): y = 2. It's correct.",
       "observations": [
         { "id": "o7a", "student": "B", "text": "{B}'s work shows 6 = 2y + 2, then 4 = 2y, then y = 2.", "relevant": true },
-        { "id": "o7b", "student": "B", "text": "{B} is watching your face for a reaction.", "relevant": true },
+        { "id": "o7b", "student": "B", "text": "{B} slides her worksheet toward you so you can see the steps.", "relevant": true },
         { "id": "o7c", "student": "A", "text": "{A} is drawing in the margin.", "relevant": false }
       ],
       "options": [
@@ -182,7 +182,7 @@
       "observations": [
         { "id": "o8a", "student": null, "text": "The clock says three minutes are left.", "relevant": true },
         { "id": "o8b", "student": "A", "text": "{A} wants to try a harder problem.", "relevant": true },
-        { "id": "o8c", "student": "C", "text": "{C}'s hood is down now.", "relevant": false }
+        { "id": "o8c", "student": null, "text": "The clock's second hand is ticking.", "relevant": false }
       ],
       "options": [
         { "id": "ticket", "move": "give-exit-ticket", "target": "all", "score": { "2": 4, "5": 4 },

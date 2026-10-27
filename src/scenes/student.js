@@ -69,23 +69,15 @@ export class Student {
       this.neck.add(eye);
       this.eyes.push(eye);
     }
-    if (L.hairStyle === 'hood') {
-      // Back half of a sphere (phi π..2π faces −z), so the face stays visible.
-      const hoodMat = shirt.clone();
-      hoodMat.side = THREE.DoubleSide;
-      const hood = new THREE.Mesh(new THREE.SphereGeometry(0.132, 24, 16, Math.PI, Math.PI, 0, Math.PI * 0.8), hoodMat);
-      hood.position.set(0, 0.12, 0.0);
-      this.neck.add(hood);
-      this.hood = hood;
-    } else {
-      const cap = new THREE.Mesh(new THREE.SphereGeometry(0.112, 24, 16, 0, Math.PI * 2, 0, Math.PI * 0.5), hair);
-      cap.position.y = 0.135;
-      this.neck.add(cap);
-      if (L.hairStyle === 'long') {
-        const back = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.22, 0.06), hair);
-        back.position.set(0, 0.03, -0.08);
-        this.neck.add(back);
-      }
+    // Hair: a cap; long hair adds a back panel. The hood was removed as a
+    // withdrawal marker (representation review: see design/character-design.md).
+    const cap = new THREE.Mesh(new THREE.SphereGeometry(0.112, 24, 16, 0, Math.PI * 2, 0, Math.PI * 0.5), hair);
+    cap.position.y = 0.135;
+    this.neck.add(cap);
+    if (L.hairStyle === 'long') {
+      const back = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.22, 0.06), hair);
+      back.position.set(0, 0.03, -0.08);
+      this.neck.add(back);
     }
 
     // Arms: shoulder → elbow joints; a pencil in the right hand.

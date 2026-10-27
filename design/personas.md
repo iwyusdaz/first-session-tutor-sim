@@ -16,8 +16,8 @@ Constructed for teaching purposes. No real likeness. See `design/character-desig
 
 | Student | Name | Pattern | Cues |
 |---|---|---|---|
-| A | Jordan (he) | Confident; answers fast; makes sign errors | Leans in, hand up often, interrupts |
+| A | Jordan (she) | Confident; answers fast; makes sign errors | Leans in, hand up often, interrupts |
 | B | Talia (she) | Quiet; understands more than she shows | Minimal eye contact, stops writing when confused, rarely volunteers |
 | C | Sam (they) | Discouraged by earlier failure; "I'm bad at math" | Slumps, arms folded, looks away, short answers |
 
-The patterns are not tied to any demographic trait.
+The patterns are not tied to any demographic trait. After the representation review, gender and skin tone were reassigned so neither pattern maps onto a demographic trait (see `design/character-design.md`).

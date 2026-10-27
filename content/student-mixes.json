@@ -1,27 +1,27 @@
 {
   "_meta": {
     "label": "All three students are fictional, constructed for teaching purposes. No real likeness.",
-    "representation": "Patterns (confident, quiet, discouraged) are not tied to any demographic trait. Names and looks were chosen so no pattern lines up with a common stereotype; see design/character-design.md.",
+    "representation": "Patterns (confident, quiet, discouraged) are not tied to any demographic trait. After the representation review, gender and skin tone were reassigned so neither maps onto the behavior patterns (quiet/dominant, discouraged/confident), and the hood was dropped as the withdrawal marker; see the decorrelation table in design/character-design.md. A human representation review has NOT been done and is recommended.",
     "stateScale": "u = understanding, e = engagement, c = confidence; integers 0-4"
   },
   "students": {
     "A": {
       "name": "Jordan",
-      "pronoun": "he",
+      "pronoun": "she",
       "pattern": "Confident; answers fast; makes sign errors",
-      "look": { "skin": "#8d5a3b", "hair": "#1f1a17", "hairStyle": "short", "shirt": "#2f6fd0", "seat": -1 }
+      "look": { "skin": "#5c3b28", "hair": "#1f1a17", "hairStyle": "short", "shirt": "#2f6fd0", "seat": -1 }
     },
     "B": {
       "name": "Talia",
       "pronoun": "she",
       "pattern": "Quiet; understands more than she shows",
-      "look": { "skin": "#d9a882", "hair": "#6b3e1f", "hairStyle": "long", "shirt": "#3c8a5a", "seat": 0 }
+      "look": { "skin": "#8d5a3b", "hair": "#6b3e1f", "hairStyle": "long", "shirt": "#3c8a5a", "seat": 0 }
     },
     "C": {
       "name": "Sam",
       "pronoun": "they",
       "pattern": "Discouraged by earlier failure; says 'I'm bad at math'",
-      "look": { "skin": "#5c3b28", "hair": "#141110", "hairStyle": "hood", "shirt": "#8a4f9e", "seat": 1 }
+      "look": { "skin": "#d9a882", "hair": "#141110", "hairStyle": "short", "shirt": "#8a4f9e", "seat": 1 }
     }
   },
   "mixes": [
