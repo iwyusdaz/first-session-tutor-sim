@@ -13,7 +13,7 @@
   "poster": {
     "webp": "poster-1.0.0.webp",
     "jpg": "poster-1.0.0.jpg",
-    "alt": "Three simulated middle-school students seated at a wooden tutoring table with worksheets, a whiteboard showing a linear equation behind them, seen from the tutor's seat"
+    "alt": "Seen from the tutor's seat: three stylized students sit across a wooden table with worksheets. One in blue raises his hand, one in green writes, one in a purple hood sits back. Behind them a whiteboard shows 4x + 7 = 23 and a wall clock."
   },
   "repoUrl": "https://github.com/iwyusdaz/first-session-tutor-sim",
   "license": { "content": "CC BY 4.0", "code": "MIT" }
