@@ -7,6 +7,7 @@
  */
 import * as THREE from 'three';
 import { Engine } from './core/engine.js';
+import { createComposer } from './core/post.js';
 import { hasWebGL2 } from './core/assets.js';
 import { Shell } from './ui/shell.js';
 import { Settings } from './ui/settings.js';
@@ -55,7 +56,11 @@ export class App {
     this._init3D();
     if (this.state.run) this._stageMoment(Math.min(this.state.run.index, this.data.session.moments.length - 1), this.state.run.mix);
     this._initDialogs();
-    this.shell.on('textmode', () => this.render());
+    this.shell.on('textmode', () => {
+      // The canvas is hidden in text mode: stop rendering it (saves battery, keeps the UI responsive).
+      if (this.engine) { if (document.getElementById('textmode').hidden) this.engine.resume(); else this.engine.pause(); }
+      this.render();
+    });
     this.shell.on('restart', () => { if (this.state.module === 1 && this.state.run) this.startRun(this.state.run.mixId); else this.render(); });
     this.gotoModule(this.state.run?.done === false ? 1 : 0, { silent: true });
 
@@ -135,8 +140,14 @@ export class App {
     this.engine.camera.near = 0.05;
     this.engine.camera.updateProjectionMatrix();
     this.room = new TutoringRoom(this.engine.scene, { mixes: this.data.mixes, renderer: this.engine.renderer });
-    this.room.applyPreset(this.engine.quality.presetDef);
-    this.engine.quality.onChange((def) => { this.room.applyPreset(def); this.engine.resize(); });
+    const applyPreset = (def) => {
+      this.room.applyPreset(def);
+      this.engine.composer?.dispose();
+      this.engine.setComposer(createComposer(this.engine.renderer, this.engine.scene, this.engine.camera, def));
+    };
+    this.engine.quality.restore();
+    applyPreset(this.engine.quality.presetDef);
+    this.engine.quality.onChange(applyPreset);
     this.player = new ShotPlayer({ container: document.getElementById('cinematic-host'), camera: this.engine.camera, motion: this.motion,
       onSkip: (id) => this.record.log('experienced', { id: `cinematic-${id}-skipped`, name: 'Cinematic skipped' }) });
     this._cam = { pos: new THREE.Vector3(...VIEWS.group.pos), look: new THREE.Vector3(...VIEWS.group.look) };

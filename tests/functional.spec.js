@@ -70,8 +70,8 @@ test('pre-check items give why-feedback', async ({ page }) => {
 });
 
 test('both student mixes play end to end; strong and weak runs score differently', async ({ page }) => {
-  // 16 moments through the real UI; headless software WebGL makes each step slow.
-  test.setTimeout(300_000);
+  // 16 moments through the real UI (~55 s headless with frame pacing; see DECISIONS.md D17).
+  test.setTimeout(150_000);
   await useManualWait(page);
   await startRun(page, 'Run 1: the quiet student');
   for (const id of BEST) await playMoment(page, id);

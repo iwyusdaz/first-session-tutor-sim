@@ -7,8 +7,8 @@ import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 
 test('overlay UI has no critical or serious axe issues', async ({ page }) => {
-  // A full run plus nine axe scans; headless software WebGL makes each step slow.
-  test.setTimeout(300_000);
+  // A full run plus nine axe scans (26–47 s headless with frame pacing; see DECISIONS.md D17).
+  test.setTimeout(150_000);
   await page.goto('/');
   await expect(page.locator('#module-h')).toBeVisible({ timeout: 20_000 });
   const scan = async (label) => {

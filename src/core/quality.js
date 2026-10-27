@@ -28,11 +28,19 @@ export class QualityManager {
   }
   storageKey() { return (window.__SLUG__ || 'app') + ':quality'; }
   restore() { try { const s = localStorage.getItem(this.storageKey()); if (s && PRESETS[s]) this.set(s); } catch { /* ignore */ } }
+  /**
+   * Step the preset from a measured frame rate (warm-up benchmark). On Low, keep
+   * lowering the resolution scale (dynamic resolution, floor 0.5) while frames stay slow.
+   * @returns {boolean} whether anything changed
+   */
   autoSelect(measuredFps) {
-    if (!this.auto || measuredFps <= 0) return;
+    if (!this.auto || measuredFps <= 0) return false;
     const idx = ORDER.indexOf(this.name);
-    if (measuredFps < 45 && idx > 0) { this.name = ORDER[idx - 1]; this.resolutionScale = PRESETS[this.name].resolutionScale; for (const fn of this.listeners) fn(this.presetDef, this.name); }
-    else if (measuredFps > 70 && idx < ORDER.length - 1) { this.name = ORDER[idx + 1]; this.resolutionScale = PRESETS[this.name].resolutionScale; for (const fn of this.listeners) fn(this.presetDef, this.name); }
+    const emit = () => { for (const fn of this.listeners) fn(this.presetDef, this.name); return true; };
+    if (measuredFps < 45 && idx > 0) { this.name = ORDER[idx - 1]; this.resolutionScale = PRESETS[this.name].resolutionScale; return emit(); }
+    if (measuredFps < 20 && this.name === 'low' && this.resolutionScale > 0.5) { this.resolutionScale = Math.max(0.5, +(this.resolutionScale - 0.125).toFixed(3)); return true; }
+    if (measuredFps > 70 && idx < ORDER.length - 1) { this.name = ORDER[idx + 1]; this.resolutionScale = PRESETS[this.name].resolutionScale; return emit(); }
+    return false;
   }
   onChange(fn) { this.listeners.push(fn); }
 }
