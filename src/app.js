@@ -5,7 +5,6 @@
  * panel in the 3D view and in text mode.
  * @module app
  */
-import * as THREE from 'three';
 import { Engine } from './core/engine.js';
 import { createComposer } from './core/post.js';
 import { hasWebGL2 } from './core/assets.js';
@@ -21,6 +20,8 @@ import { createRun, choose, currentMoment, studentCues, fill, scoreRun, STUDENT_
 import { renderMoment } from './ui/session-panel.js';
 import { renderDebrief } from './ui/debrief.js';
 import { renderIntro, renderRunPicker, renderAfter } from './ui/modules.js';
+import { applyCaseGrade, initFloatingHud } from './v2/cinematic-grade.js';
+import { InWorldInteractionManager } from './v2/in-world-interaction.js';
 
 import session from '../content/session.json';
 import rules from '../content/behavior-rules.json';
@@ -54,6 +55,11 @@ export class App {
     this.panel.tabIndex = -1;
     this.panel.setAttribute('aria-label', 'Session');
     this.shell.overlays.appendChild(this.panel);
+
+    // v2.0.0 full-bleed 3D + floating HUD drawer: adds "Hide panel"/"Show panel"
+    // and the Plain-font toggle to the header nav (html[data-drawer-collapsed]
+    // slides #session-panel aside via hud-shell.css).
+    initFloatingHud({ slug: SLUG, panel: this.panel });
 
     this._init3D();
     if (this.state.run) this._stageMoment(Math.min(this.state.run.index, this.data.session.moments.length - 1), this.state.run.mix);
@@ -135,6 +141,8 @@ export class App {
   /* ---------- 3D ---------- */
   _init3D() {
     this.engine = null;
+    // Case grade also drives the CSS theme tokens, so text mode keeps the palette.
+    applyCaseGrade(SLUG, {});
     if (!hasWebGL2()) {
       document.getElementById('stage').insertAdjacentHTML('beforeend',
         '<div data-webgl-fallback role="alert"><p>WebGL is not available in this browser. Every part of the session works in <strong>Text mode</strong>.</p></div>');
@@ -144,7 +152,24 @@ export class App {
     this.engine.camera.fov = 55;
     this.engine.camera.near = 0.05;
     this.engine.camera.updateProjectionMatrix();
-    this.room = new TutoringRoom(this.engine.scene, { mixes: this.data.mixes, renderer: this.engine.renderer });
+    // v2 case grade: AgX tone mapping, warm exposure, fog and the sky dome.
+    applyCaseGrade(SLUG, { renderer: this.engine.renderer, scene: this.engine.scene, skyRadius: 60 });
+    this.room = new TutoringRoom(this.engine.scene, { mixes: this.data.mixes, renderer: this.engine.renderer, reducedMotion: this.motion.reduced });
+    // In-world interaction: hotspot rings, hover highlights, click-to-glide, WASD.
+    this.interact = new InWorldInteractionManager({
+      canvas: this.engine.renderer.domElement,
+      camera: this.engine.camera,
+      scene: this.engine.scene,
+      overlayRoot: this.shell.overlays,
+      bounds: [-2.9, 2.9, -2.1, 2.3],
+      walkSpeed: 1.5,
+      reducedMotion: this.motion.reduced,
+    });
+    this.room.registerInteraction(this.interact, (view) => this.lookAt(view));
+    this.motion.onChange((reduced) => {
+      if (this.room) this.room.update(0, reduced, this.engine.camera);
+      if (this.interact) this.interact.reducedMotion = reduced;
+    });
     const applyPreset = (def) => {
       this.room.applyPreset(def);
       this.engine.composer?.dispose();
@@ -156,33 +181,23 @@ export class App {
     this.player = new ShotPlayer({ container: document.getElementById('cinematic-host'), camera: this.engine.camera, motion: this.motion,
       captions: () => this.settings?.state.captions !== false,
       onSkip: (id) => this.record.log('experienced', { id: `cinematic-${id}-skipped`, name: 'Cinematic skipped' }) });
-    this._cam = { pos: new THREE.Vector3(...VIEWS.group.pos), look: new THREE.Vector3(...VIEWS.group.look) };
-    this._camTarget = null;
     this.lookAt('group', { snap: true });
+    this._elapsed = 0;
     this.engine.onUpdate((dt) => {
-      if (this._camTarget && !this.player.playing) {
-        const k = this.motion.reduced ? 1 : 1 - Math.exp(-dt * 5);
-        this._cam.pos.lerp(this._camTarget.pos, k);
-        this._cam.look.lerp(this._camTarget.look, k);
-        this.engine.camera.position.copy(this._cam.pos);
-        this.engine.camera.lookAt(this._cam.look);
-      }
-      this.room.update(dt, this.motion.reduced);
+      this._elapsed += dt;
+      // Cinematics drive the camera themselves; in-world navigation yields while one plays.
+      if (this.interact && !this.player?.playing) this.interact.update(dt, this._elapsed);
+      this.room.update(dt, this.motion.reduced, this.engine.camera);
     });
     this._applyStudents(this.state.run?.students ?? this.data.mixes.mixes[0].initial, { snap: true });
     this.engine.start();
   }
 
   lookAt(view, { snap = false } = {}) {
-    if (!this.engine) return;
+    if (!this.engine || !this.interact) return;
     const v = VIEWS[view];
-    this._camTarget = { pos: new THREE.Vector3(...v.pos), look: new THREE.Vector3(...v.look) };
-    if (snap || this.motion.reduced) {
-      this._cam.pos.copy(this._camTarget.pos);
-      this._cam.look.copy(this._camTarget.look);
-      this.engine.camera.position.copy(this._cam.pos);
-      this.engine.camera.lookAt(this._cam.look);
-    }
+    if (!v) return;
+    this.interact.glideTo(v.pos, v.look, snap ? 0.03 : 1.15);
     if (!snap) announce(`Looking at ${v.label}`);
   }
 
@@ -208,6 +223,14 @@ export class App {
     }
   }
 
+  /** Lip-flap on a student's response, auto-clearing after ~3 s. */
+  _setSpeakingFor(id, on) {
+    this._speakTimers = this._speakTimers || {};
+    clearTimeout(this._speakTimers[id]);
+    this.room?.setSpeaking(id, on);
+    if (on) this._speakTimers[id] = setTimeout(() => this.room?.setSpeaking(id, false), 3200);
+  }
+
   /* ---------- flow ---------- */
   _target() {
     const tm = document.getElementById('textmode');
@@ -218,6 +241,9 @@ export class App {
 
   render({ focus = true } = {}) {
     const { el, textMode } = this._target();
+    // Calm mode: ambient life slows to ~30% while a decision is on screen (locked
+    // owner decision 1); it runs fully between moments and in the other modules.
+    this.room?.setCalmMode(!textMode && this.state.module === 1 && Boolean(this.state.run) && !this.state.run.done);
     el.replaceChildren();
     const mod = this.state.module;
     if (mod === 0) renderIntro(this, el);
@@ -283,6 +309,15 @@ export class App {
     entry.wait = wait;
     entry.phrasingIdx = phrasingIdx;
     this._applyStudents(this.state.run.students);
+    // The decision is made: ambient life runs again while the room reacts.
+    this.room?.setCalmMode(false);
+    // Lip-flap: students the move landed on visibly answer (a few seconds, then stop).
+    if (this.room) {
+      for (const id of STUDENT_IDS) this._setSpeakingFor(id, false);
+      for (const a of entry.applied) {
+        for (const c of a.changes) this._setSpeakingFor(c.student, true);
+      }
+    }
     const errId = this.state.run.mix.error.student;
     if (moment.id === 'm3' && this.room && ['probe', 'partial', 'tell'].includes(entry.optionId)) {
       this.room.setWork(errId, ['Guided practice', fill(moment.board, this.data, this.state.run.mix), ...this.state.run.mix.error.fixed], { mark: 'fixed' });
