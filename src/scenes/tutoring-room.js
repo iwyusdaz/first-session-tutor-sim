@@ -179,16 +179,19 @@ export class TutoringRoom {
     // ONE shared material (was one per wall): shared materials are what lets
     // mergeStaticGroup collapse all seven walls into a single draw call.
     const wallMat = this._pbrMaterial(TEX.wall, 3.5, 1.5, { color: 0xefe6d8 });
-    this._box(7, 3, 0.1, wallMat, 0, 1.5, -2.5); // back wall
+    // Walls receive shadows but never cast them (shadow discipline: casters are
+    // whitelisted to the characters + large furniture — wall shadow shapes are
+    // invisible from inside the room and only cost shadow-pass draws).
+    this._box(7, 3, 0.1, wallMat, 0, 1.5, -2.5, { shadow: false }); // back wall
     // Left wall segments around the window.
-    this._box(0.1, 3, 1.85, wallMat, -3.2, 1.5, -2.65); // z -3.575..-1.725
-    this._box(0.1, 3, 3.05, wallMat, -3.2, 1.5, 2.075); // z 0.55..3.6
-    this._box(0.1, 0.95, 2.3, wallMat, -3.2, 0.475, -0.6); // under sill
-    this._box(0.1, 0.65, 2.3, wallMat, -3.2, 2.675, -0.6); // above head
+    this._box(0.1, 3, 1.85, wallMat, -3.2, 1.5, -2.65, { shadow: false }); // z -3.575..-1.725
+    this._box(0.1, 3, 3.05, wallMat, -3.2, 1.5, 2.075, { shadow: false }); // z 0.55..3.6
+    this._box(0.1, 0.95, 2.3, wallMat, -3.2, 0.475, -0.6, { shadow: false }); // under sill
+    this._box(0.1, 0.65, 2.3, wallMat, -3.2, 2.675, -0.6, { shadow: false }); // above head
     // Right wall with a door opening at z -1.6..-0.7 (corridor door).
-    this._box(0.1, 3, 1.9, wallMat, 3.2, 1.5, -2.55); // z -3.5..-1.6
-    this._box(0.1, 3, 4.2, wallMat, 3.2, 1.5, 1.4); // z -0.7..3.5
-    this._box(0.1, 0.95, 0.95, wallMat, 3.2, 0.475, -1.15); // above door head
+    this._box(0.1, 3, 1.9, wallMat, 3.2, 1.5, -2.55, { shadow: false }); // z -3.5..-1.6
+    this._box(0.1, 3, 4.2, wallMat, 3.2, 1.5, 1.4, { shadow: false }); // z -0.7..3.5
+    this._box(0.1, 0.95, 0.95, wallMat, 3.2, 0.475, -1.15, { shadow: false }); // above door head
 
     // Skirting board (small trim: casts no shadow).
     const skirtMat = new THREE.MeshStandardMaterial({ color: 0xdcd4c4, roughness: 0.55 });
@@ -200,11 +203,11 @@ export class TutoringRoom {
 
     // --- Window: frame, mullion, glass, blinds; real 3D exterior beyond. ---
     const frameMat = new THREE.MeshStandardMaterial({ color: 0xf5f2ea, roughness: 0.5 });
-    this._box(0.08, 1.5, 0.07, frameMat, -3.16, 1.65, -1.72);
-    this._box(0.08, 1.5, 0.07, frameMat, -3.16, 1.65, 0.52);
-    this._box(0.08, 0.07, 2.34, frameMat, -3.16, 0.93, -0.6);
-    this._box(0.08, 0.07, 2.34, frameMat, -3.16, 2.37, -0.6);
-    this._box(0.05, 1.4, 0.05, frameMat, -3.16, 1.65, -0.6); // center mullion
+    this._box(0.08, 1.5, 0.07, frameMat, -3.16, 1.65, -1.72, { shadow: false });
+    this._box(0.08, 1.5, 0.07, frameMat, -3.16, 1.65, 0.52, { shadow: false });
+    this._box(0.08, 0.07, 2.34, frameMat, -3.16, 0.93, -0.6, { shadow: false });
+    this._box(0.08, 0.07, 2.34, frameMat, -3.16, 2.37, -0.6, { shadow: false });
+    this._box(0.05, 1.4, 0.05, frameMat, -3.16, 1.65, -0.6, { shadow: false }); // center mullion
     const glass = new THREE.Mesh(new THREE.PlaneGeometry(2.2, 1.4), new THREE.MeshStandardMaterial({
       color: 0xdfeaf2, emissive: 0xcfe0ee, emissiveIntensity: 0.3, transparent: true, opacity: 0.28, roughness: 0.05, metalness: 0.1,
     }));
@@ -231,28 +234,26 @@ export class TutoringRoom {
     for (const [tx, tz, h] of [[-4.6, -1.6, 2.6], [-5.4, 0.4, 3.2], [-4.4, 1.6, 2.2], [-6.4, -1.0, 3.6], [-6.2, 1.9, 2.8]]) {
       const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.13, h, 8), trunkMat);
       trunk.position.set(tx, h / 2, tz);
-      trunk.castShadow = true;
       g.add(trunk);
       for (const [oy, r] of [[h + 0.15, 0.85], [h + 0.7, 0.6]]) {
         const blob = new THREE.Mesh(new THREE.SphereGeometry(r, 10, 8), leafMat);
         blob.position.set(tx, oy, tz);
         blob.scale.y = 0.85;
-        blob.castShadow = true;
         g.add(blob);
       }
     }
     // Playground: swing frame + slide, seen through the window.
     const playMat = new THREE.MeshStandardMaterial({ color: 0xc24d3a, roughness: 0.6 });
     for (const px of [-4.9, -3.9]) {
-      this._box(0.07, 1.7, 0.07, playMat, px, 0.85, -2.2);
-      this._box(0.07, 1.7, 0.07, playMat, px, 0.85, -1.5);
+      this._box(0.07, 1.7, 0.07, playMat, px, 0.85, -2.2, { shadow: false });
+      this._box(0.07, 1.7, 0.07, playMat, px, 0.85, -1.5, { shadow: false });
     }
-    this._box(0.07, 0.07, 0.85, playMat, -4.9, 1.72, -1.85);
-    this._box(0.07, 0.07, 0.85, playMat, -3.9, 1.72, -1.85);
-    this._box(0.07, 0.07, 1.1, playMat, -4.4, 1.72, -1.85);
-    const slide = this._box(0.5, 0.04, 1.4, new THREE.MeshStandardMaterial({ color: 0x3a6ea5, roughness: 0.4, metalness: 0.2 }), -5.6, 0.65, 0.9);
+    this._box(0.07, 0.07, 0.85, playMat, -4.9, 1.72, -1.85, { shadow: false });
+    this._box(0.07, 0.07, 0.85, playMat, -3.9, 1.72, -1.85, { shadow: false });
+    this._box(0.07, 0.07, 1.1, playMat, -4.4, 1.72, -1.85, { shadow: false });
+    const slide = this._box(0.5, 0.04, 1.4, new THREE.MeshStandardMaterial({ color: 0x3a6ea5, roughness: 0.4, metalness: 0.2 }), -5.6, 0.65, 0.9, { shadow: false });
     slide.rotation.set(-0.62, 0.35, 0);
-    this._box(0.5, 0.9, 0.06, playMat, -6.05, 0.45, 0.35);
+    this._box(0.5, 0.9, 0.06, playMat, -6.05, 0.45, 0.35, { shadow: false });
     // Painted distant treeline + horizon (canvas), far behind the real geometry.
     const treeline = new THREE.Mesh(new THREE.PlaneGeometry(11, 3), new THREE.MeshBasicMaterial({
       map: canvasTexture(512, 160, (g, w, h) => {
@@ -279,7 +280,7 @@ export class TutoringRoom {
     this.boardTex.colorSpace = THREE.SRGBColorSpace;
     const trayMat = new THREE.MeshStandardMaterial({ color: 0x2e4a3f, roughness: 0.55 });
     this._box(2.3, 1.15, 0.04, new THREE.MeshStandardMaterial({ color: 0x9aa1a8, roughness: 0.5, metalness: 0.3 }), 0, 1.45, -2.43);
-    this._box(2.34, 0.05, 0.09, trayMat, 0, 0.855, -2.42);
+    this._box(2.34, 0.05, 0.09, trayMat, 0, 0.855, -2.42, { shadow: false });
     const board = new THREE.Mesh(new THREE.PlaneGeometry(2.2, 1.05), new THREE.MeshStandardMaterial({ map: this.boardTex, roughness: 0.35 }));
     board.position.set(0, 1.45, -2.4);
     g.add(board);
@@ -357,9 +358,9 @@ export class TutoringRoom {
 
     // Radiator under the window.
     const radMat = new THREE.MeshStandardMaterial({ color: 0xe8e2d4, roughness: 0.5, metalness: 0.3 });
-    this._box(1.7, 0.08, 0.14, radMat, -3.02, 0.55, -0.6);
-    this._box(1.7, 0.06, 0.14, radMat, -3.02, 0.1, -0.6);
-    for (let i = 0; i < 12; i++) this._box(0.05, 0.42, 0.1, radMat, -3.02, 0.33, -1.38 + i * 0.145);
+    this._box(1.7, 0.08, 0.14, radMat, -3.02, 0.55, -0.6, { shadow: false });
+    this._box(1.7, 0.06, 0.14, radMat, -3.02, 0.1, -0.6, { shadow: false });
+    for (let i = 0; i < 12; i++) this._box(0.05, 0.42, 0.1, radMat, -3.02, 0.33, -1.38 + i * 0.145, { shadow: false });
 
     // Light: window-side key light (warm afternoon sun, shadows by preset) + fill.
     s.add(new THREE.HemisphereLight(0xffe4b5, 0x4d4337, 0.6));
@@ -377,16 +378,16 @@ export class TutoringRoom {
   _buildCorridor() {
     // Corridor beyond the right-wall door (visible through the opening).
     const wallMat = this._pbrMaterial(TEX.wall, 2, 1.5, { color: 0xe7dfd0 });
-    this._box(0.08, 2.6, 7, wallMat, 4.4, 1.3, 0);
-    this._box(1.3, 0.08, 7, new THREE.MeshStandardMaterial({ color: 0xd9d2c2, roughness: 0.8 }), 3.85, 2.64, 0); // corridor ceiling
-    this._box(1.2, 2.6, 0.08, wallMat, 3.85, 1.3, -3.5);
+    this._box(0.08, 2.6, 7, wallMat, 4.4, 1.3, 0, { shadow: false });
+    this._box(1.3, 0.08, 7, new THREE.MeshStandardMaterial({ color: 0xd9d2c2, roughness: 0.8 }), 3.85, 2.64, 0, { shadow: false }); // corridor ceiling
+    this._box(1.2, 2.6, 0.08, wallMat, 3.85, 1.3, -3.5, { shadow: false });
     // Door frame + a panel ajar so the doorway reads as a door, not a hole.
     const frameMat = new THREE.MeshStandardMaterial({ color: 0x8a6f4d, roughness: 0.6 });
-    this._box(0.06, 2.1, 0.06, frameMat, 3.17, 1.05, -1.63);
-    this._box(0.06, 2.1, 0.06, frameMat, 3.17, 1.05, -0.67);
-    this._box(0.06, 0.06, 1.0, frameMat, 3.17, 2.12, -1.15);
+    this._box(0.06, 2.1, 0.06, frameMat, 3.17, 1.05, -1.63, { shadow: false });
+    this._box(0.06, 2.1, 0.06, frameMat, 3.17, 1.05, -0.67, { shadow: false });
+    this._box(0.06, 0.06, 1.0, frameMat, 3.17, 2.12, -1.15, { shadow: false });
     const doorMat = new THREE.MeshStandardMaterial({ color: 0x9c7b52, roughness: 0.6 });
-    const door = this._box(0.045, 2.04, 0.9, doorMat, 3.32, 1.02, -0.32);
+    const door = this._box(0.045, 2.04, 0.9, doorMat, 3.32, 1.02, -0.32, { shadow: false });
     door.rotation.y = -1.9; // ajar, hinged at the far edge
     const knob = new THREE.Mesh(new THREE.SphereGeometry(0.03, 10, 8), new THREE.MeshStandardMaterial({ color: 0xb08d57, metalness: 0.7, roughness: 0.35 }));
     knob.position.set(3.36, 1.0, -0.85);
@@ -459,8 +460,10 @@ export class TutoringRoom {
     await this.models.place(this.staticRoom, 'SchoolChair_01', { position: [2.75, 0, -1.75], rotationY: -Math.PI / 2, targetHeight: 0.85 });
     // Bookshelf with the encyclopedia set on top, plant in the window corner.
     await this.models.place(this.staticRoom, 'wooden_bookshelf_worn', { position: [-1.95, 0, -2.28], targetHeight: 1.85 });
-    await this.models.place(this.staticRoom, 'book_encyclopedia_set_01', { position: [-1.95, 1.84, -2.28], targetHeight: 0.26 });
-    await this.models.place(this.staticRoom, 'potted_plant_02', { position: [-2.72, 0, 1.05], targetHeight: 1.15 });
+    // Books + plant: small props cast no real shadow (their contact-shadow disc
+    // grounds them) — the shadow caster whitelist is characters + large furniture.
+    await this.models.place(this.staticRoom, 'book_encyclopedia_set_01', { position: [-1.95, 1.84, -2.28], targetHeight: 0.26, castShadow: false });
+    await this.models.place(this.staticRoom, 'potted_plant_02', { position: [-2.72, 0, 1.05], targetHeight: 1.15, castShadow: false });
     // Wall clock model behind the readable canvas face.
     await this.models.place(this.staticRoom, 'wall_clock', { position: [1.9, 1.66, -2.42], targetHeight: 0.42, contactShadow: false });
   }

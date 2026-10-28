@@ -13,6 +13,14 @@
  * @module v2/in-world-interaction
  */
 import * as THREE from 'three';
+import * as BufferGeometryUtils from 'three/examples/jsm/utils/BufferGeometryUtils.js';
+
+// Floating height of the hotspot diamond beacon. Raised from 0.36 m (arrival-english
+// V-3): the default cameras sit at y ~1.6 with a 55 deg FOV, so a floor-level beacon
+// was below the frustum edge until you dragged to look down. At ~0.9 m the glow is
+// inside the default view for every hotspot ring, while the floor ring still marks
+// the exact glide target.
+const BEACON_Y = 0.9;
 
 function easeInOutCubic(x) {
   return x < 0.5 ? 4 * x * x * x : 1 - (-2 * x + 2) ** 3 / 2;
@@ -208,33 +216,40 @@ export class InWorldInteractionManager {
     group.position.set(x, y, z);
 
     const color = opts.color ?? 0x38bdf8;
-    const outer = new THREE.Mesh(
-      new THREE.RingGeometry(0.28, 0.38, 32),
+    // Outer ring + inner disc merged into ONE mesh (perf revision: 3 → 2 draw
+    // calls per ring). They share one hue but different opacities, so the alpha
+    // difference is baked per vertex as a 4-component colour attribute
+    // (three.js enables vertex alpha when the colour attribute has itemSize 4).
+    const withAlpha = (geo, alpha, yPos) => {
+      const g = geo.toNonIndexed();
+      g.rotateX(-Math.PI / 2);
+      g.translate(0, yPos, 0);
+      const count = g.attributes.position.count;
+      const colors = new Float32Array(count * 4);
+      const c = new THREE.Color(color);
+      for (let i = 0; i < count; i++) {
+        colors[i * 3] = c.r;
+        colors[i * 3 + 1] = c.g;
+        colors[i * 3 + 2] = c.b;
+        colors[i * 3 + 3] = alpha;
+      }
+      g.setAttribute('color', new THREE.BufferAttribute(colors, 4));
+      return g;
+    };
+    const ring = new THREE.Mesh(
+      BufferGeometryUtils.mergeGeometries([
+        withAlpha(new THREE.RingGeometry(0.28, 0.38, 32), 0.85, 0.02),
+        withAlpha(new THREE.CircleGeometry(0.26, 28), 0.22, 0.015),
+      ], false),
       new THREE.MeshBasicMaterial({
-        color,
+        color: 0xffffff,
+        vertexColors: true,
         side: THREE.DoubleSide,
         transparent: true,
-        opacity: 0.85,
         depthWrite: false,
       }),
     );
-    outer.rotation.x = -Math.PI / 2;
-    outer.position.y = 0.02;
-    group.add(outer);
-
-    const disc = new THREE.Mesh(
-      new THREE.CircleGeometry(0.26, 28),
-      new THREE.MeshBasicMaterial({
-        color,
-        side: THREE.DoubleSide,
-        transparent: true,
-        opacity: 0.22,
-        depthWrite: false,
-      }),
-    );
-    disc.rotation.x = -Math.PI / 2;
-    disc.position.y = 0.015;
-    group.add(disc);
+    group.add(ring);
 
     // Floating diamond beacon above the ring
     const diamond = new THREE.Mesh(
@@ -246,11 +261,13 @@ export class InWorldInteractionManager {
         roughness: 0.2,
       }),
     );
-    diamond.position.y = 0.36;
+    diamond.position.y = BEACON_Y;
     group.add(diamond);
 
     (opts.parent || this.scene).add(group);
-    this.hotspotRings.push({ group, outer, diamond, phase: this.hotspotRings.length * 1.1 });
+    // `ring` is the merged ring+disc mesh (pulses as one — the disc used to hold
+    // still; pulsing both reads slightly better and costs the same).
+    this.hotspotRings.push({ group, ring, diamond, phase: this.hotspotRings.length * 1.1 });
 
     this.registerInteractive(group, {
       id: opts.id || `hotspot-${this.hotspotRings.length}`,
@@ -461,13 +478,14 @@ export class InWorldInteractionManager {
       const pulseScale = this.calmFactor ?? 1;
       for (const r of this.hotspotRings) {
         const s = 1 + Math.sin(elapsed * 2.6 + r.phase) * 0.08 * pulseScale;
-        r.outer.scale.setScalar(s);
-        r.diamond.position.y = 0.36 + Math.sin(elapsed * 2.6 + r.phase) * 0.04 * pulseScale;
+        r.ring.scale.setScalar(s);
+        r.diamond.position.y = BEACON_Y + Math.sin(elapsed * 2.6 + r.phase) * 0.04 * pulseScale;
         r.diamond.rotation.y = elapsed * 1.4 * Math.max(0.3, pulseScale) + r.phase;
       }
     }
 
-    // 4. Project persistent 3D speech bubbles / callouts
+    // 4. Project persistent 3D speech bubbles / callouts (clamped to the canvas
+    // so high anchors never overlap the app header).
     if (this.bubbles?.size && this.canvas) {
       const rect = this.canvas.getBoundingClientRect();
       const _v = new THREE.Vector3();
@@ -484,8 +502,8 @@ export class InWorldInteractionManager {
           continue;
         }
         rec.el.hidden = false;
-        const x = ((_v.x * 0.5 + 0.5) * rect.width) + rect.left;
-        const y = ((-_v.y * 0.5 + 0.5) * rect.height) + rect.top;
+        const x = THREE.MathUtils.clamp(((_v.x * 0.5 + 0.5) * rect.width) + rect.left, rect.left + 130, rect.right - 130);
+        const y = Math.max(rect.top + 92, ((-_v.y * 0.5 + 0.5) * rect.height) + rect.top);
         rec.el.style.transform = `translate(-50%, -100%) translate(${Math.round(x)}px, ${Math.round(y)}px)`;
       }
     }

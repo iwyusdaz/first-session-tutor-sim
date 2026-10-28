@@ -35,18 +35,30 @@ export function mergeStaticGroup(group) {
   const animated = [];
   const mergedNodes = new Set();
 
-  group.traverse((node) => {
-    if (node === group) return;
-    if (!node.isMesh || node.isSkinnedMesh) { animated.push(node); return; }
-    if (Array.isArray(node.material)) { animated.push(node); return; }
-    const geom = node.geometry;
-    if (!geom || (geom.morphAttributes && Object.keys(geom.morphAttributes).length)) {
-      animated.push(node);
-      return;
+  // Manual walk (instead of traverse()) so whole subtrees can opt out with
+  // `userData.v2NoMerge` — animated wrappers like bobbing boats and swinging
+  // pendant lamps keep their meshes, otherwise they would be merged away and
+  // their oscillators would animate empty groups. Sign planes (canvas textures
+  // that act as raycast/hover targets) and InstancedMeshes are kept whole too.
+  const collect = (node) => {
+    for (const child of node.children) {
+      if (child.userData?.v2NoMerge) { animated.push(child); continue; }
+      if (!child.isMesh || child.isSkinnedMesh || child.isInstancedMesh
+          || child.userData?.sign || Array.isArray(child.material)) {
+        animated.push(child);
+      } else {
+        const geom = child.geometry;
+        if (!geom || (geom.morphAttributes && Object.keys(geom.morphAttributes).length)) {
+          animated.push(child);
+        } else {
+          if (!byMaterial.has(child.material)) byMaterial.set(child.material, []);
+          byMaterial.get(child.material).push(child);
+        }
+      }
+      collect(child);
     }
-    if (!byMaterial.has(node.material)) byMaterial.set(node.material, []);
-    byMaterial.get(node.material).push(node);
-  });
+  };
+  collect(group);
   if (byMaterial.size === 0) return 0;
 
   const KEEP = ['position', 'normal', 'uv'];
