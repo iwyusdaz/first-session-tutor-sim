@@ -28,6 +28,69 @@
     "changes": "None to pixels. Used on the walls; files renamed with content hashes."
   },
   {
+    "asset": "SchoolDesk_01 (GLB model)",
+    "author": "Ethan Place",
+    "source": "https://polyhaven.com/a/SchoolDesk_01",
+    "license": "CC0",
+    "changes": "None. Student desks and tutor desk. File renamed with a content hash."
+  },
+  {
+    "asset": "SchoolChair_01 (GLB model)",
+    "author": "Ethan Place",
+    "source": "https://polyhaven.com/a/SchoolChair_01",
+    "license": "CC0",
+    "changes": "None. Student chairs. File renamed with a content hash."
+  },
+  {
+    "asset": "wooden_bookshelf_worn (GLB model)",
+    "author": "Ulan Cabanilla",
+    "source": "https://polyhaven.com/a/wooden_bookshelf_worn",
+    "license": "CC0",
+    "changes": "None. Back-wall bookshelf. File renamed with a content hash."
+  },
+  {
+    "asset": "wall_clock (GLB model)",
+    "author": "PierreB3D",
+    "source": "https://polyhaven.com/a/wall_clock",
+    "license": "CC0",
+    "changes": "Session time drawn on a canvas face in front of the model. File renamed with a content hash."
+  },
+  {
+    "asset": "book_encyclopedia_set_01 (GLB model)",
+    "author": "John Malcolm",
+    "source": "https://polyhaven.com/a/book_encyclopedia_set_01",
+    "license": "CC0",
+    "changes": "None. Books on the bookshelf. File renamed with a content hash."
+  },
+  {
+    "asset": "potted_plant_02 (GLB model)",
+    "author": "Rico Cilliers",
+    "source": "https://polyhaven.com/a/potted_plant_02",
+    "license": "CC0",
+    "changes": "None. Corner plant. File renamed with a content hash."
+  },
+  {
+    "asset": "Sora (woff2, Latin subset, 600/700)",
+    "author": "Jonathan Barnbrook; The Sora Project",
+    "source": "https://fonts.google.com/specimen/Sora",
+    "license": "SIL OFL 1.1",
+    "changes": "Subset to Latin, converted to woff2 (`src/styles/fonts/`)."
+  },
+  {
+    "asset": "Lexend (woff2, Latin subset, 400/600)",
+    "author": "Bonnie E. Shinta, Prof. Kevin Larson (Readability Consortium)",
+    "source": "https://fonts.google.com/specimen/Lexend",
+    "license": "SIL OFL 1.1",
+    "changes": "Subset to Latin, converted to woff2 (`src/styles/fonts/`)."
+  },
+  {
+    "asset": "Patrick Hand (woff2, Latin subset, 400)",
+    "author": "Patrick Wagesreither",
+    "source": "https://fonts.google.com/specimen/Patrick+Hand",
+    "license": "SIL OFL 1.1",
+    "changes": "Subset to Latin, converted to woff2 (`src/styles/fonts/`)."
+  },
+  {
     "asset": "three.js 0.186.1",
     "author": "three.js authors",
     "source": "https://github.com/mrdoob/three.js",

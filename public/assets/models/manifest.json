@@ -1,0 +1,56 @@
+{
+  "SchoolDesk_01": {
+    "id": "SchoolDesk_01",
+    "file": "assets/models/SchoolDesk_01-4084f652.glb",
+    "name": "School Desk 01",
+    "authors": "Ethan Place",
+    "source": "https://polyhaven.com/a/SchoolDesk_01",
+    "license": "CC0 1.0",
+    "sizeKB": 200
+  },
+  "SchoolChair_01": {
+    "id": "SchoolChair_01",
+    "file": "assets/models/SchoolChair_01-98f730a5.glb",
+    "name": "School Chair 01",
+    "authors": "Ethan Place",
+    "source": "https://polyhaven.com/a/SchoolChair_01",
+    "license": "CC0 1.0",
+    "sizeKB": 210
+  },
+  "wooden_bookshelf_worn": {
+    "id": "wooden_bookshelf_worn",
+    "file": "assets/models/wooden_bookshelf_worn-5e5f5d85.glb",
+    "name": "Wooden Bookshelf Worn",
+    "authors": "Ulan Cabanilla",
+    "source": "https://polyhaven.com/a/wooden_bookshelf_worn",
+    "license": "CC0 1.0",
+    "sizeKB": 414
+  },
+  "wall_clock": {
+    "id": "wall_clock",
+    "file": "assets/models/wall_clock-1d19734d.glb",
+    "name": "Wall Clock",
+    "authors": "PierreB3D",
+    "source": "https://polyhaven.com/a/wall_clock",
+    "license": "CC0 1.0",
+    "sizeKB": 238
+  },
+  "book_encyclopedia_set_01": {
+    "id": "book_encyclopedia_set_01",
+    "file": "assets/models/book_encyclopedia_set_01-dadb9479.glb",
+    "name": "Book Encyclopedia Set 01",
+    "authors": "John Malcolm",
+    "source": "https://polyhaven.com/a/book_encyclopedia_set_01",
+    "license": "CC0 1.0",
+    "sizeKB": 2657
+  },
+  "potted_plant_02": {
+    "id": "potted_plant_02",
+    "file": "assets/models/potted_plant_02-2e9c2b21.glb",
+    "name": "Potted Plant 02",
+    "authors": "Rico Cilliers",
+    "source": "https://polyhaven.com/a/potted_plant_02",
+    "license": "CC0 1.0",
+    "sizeKB": 1980
+  }
+}
