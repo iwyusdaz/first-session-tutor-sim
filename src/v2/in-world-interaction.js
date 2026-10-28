@@ -44,6 +44,7 @@ export class InWorldInteractionManager {
     this.pickables = [];
     this.hotspotRings = [];
     this.hovered = null;
+    this.calmFactor = 1; // set via setCalmMode to quiet ring pulses during focused tasks
 
     // Camera navigation state (look target + spherical/free walk)
     this.target = new THREE.Vector3(0, 1.3, 0);
@@ -145,6 +146,13 @@ export class InWorldInteractionManager {
       this.camera.position.z + dz * dist,
     );
     this.camera.lookAt(this.target);
+  }
+
+  /**
+   * Quiet the hotspot-ring pulse during focused tasks (0.3) or restore it (1).
+   */
+  setCalmMode(active) {
+    this.calmFactor = active ? 0.3 : 1;
   }
 
   /**
@@ -448,13 +456,14 @@ export class InWorldInteractionManager {
       }
     }
 
-    // 3. Animate hotspot rings
+    // 3. Animate hotspot rings (scaled by the calm factor so focused tasks stay quiet)
     if (!this.reducedMotion) {
+      const pulseScale = this.calmFactor ?? 1;
       for (const r of this.hotspotRings) {
-        const s = 1 + Math.sin(elapsed * 2.6 + r.phase) * 0.08;
+        const s = 1 + Math.sin(elapsed * 2.6 + r.phase) * 0.08 * pulseScale;
         r.outer.scale.setScalar(s);
-        r.diamond.position.y = 0.36 + Math.sin(elapsed * 2.6 + r.phase) * 0.04;
-        r.diamond.rotation.y = elapsed * 1.4 + r.phase;
+        r.diamond.position.y = 0.36 + Math.sin(elapsed * 2.6 + r.phase) * 0.04 * pulseScale;
+        r.diamond.rotation.y = elapsed * 1.4 * Math.max(0.3, pulseScale) + r.phase;
       }
     }
 

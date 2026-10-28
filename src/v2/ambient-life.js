@@ -30,6 +30,7 @@ function mulberry32(seed = 42) {
 }
 
 let _softParticleTex = null;
+const _sharedVec = new THREE.Vector3();
 function getSoftParticleTexture() {
   if (_softParticleTex) return _softParticleTex;
   if (typeof document === 'undefined') return null;
@@ -217,6 +218,10 @@ export class AmbientLifeManager {
       stopRadius: opts.stopRadius ?? 2.4,
       yOffset: opts.yOffset ?? 0,
     };
+    // Place the mover on its path immediately so reduced-motion (which pauses
+    // updates) never leaves it standing at the world origin.
+    mover.curve.getPointAt(mover.u, _sharedVec);
+    object3d.position.set(_sharedVec.x, _sharedVec.y + mover.yOffset, _sharedVec.z);
     this.splineMovers.push(mover);
     return mover;
   }

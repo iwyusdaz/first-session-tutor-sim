@@ -41,10 +41,10 @@ export const VIEWS = {
   group: { pos: [0.05, 1.3, 1.5], look: [0.4, 1.02, -0.6], label: 'The whole group' },
   A: { pos: [0.2, 1.32, 0.65], look: [-0.62, 1.14, -1.02], label: 'Jordan' },
   B: { pos: [0, 1.32, 0.65], look: [0, 1.14, -1.02], label: 'Talia' },
-  C: { pos: [-0.2, 1.32, 0.65], look: [0.62, 1.14, -1.02], label: 'Sam' },
+  C: { pos: [-0.34, 1.32, 0.65], look: [0.62, 1.14, -1.02], label: 'Sam' },
   'A-work': { pos: [-0.62, 1.22, 0.18], look: [-0.62, 0.79, -0.55], label: "Jordan's worksheet" },
   'B-work': { pos: [0, 1.22, 0.18], look: [0, 0.79, -0.55], label: "Talia's worksheet" },
-  'C-work': { pos: [0.62, 1.22, 0.18], look: [0.62, 0.79, -0.55], label: "Sam's worksheet" },
+  'C-work': { pos: [0.48, 1.22, 0.18], look: [0.62, 0.79, -0.55], label: "Sam's worksheet" },
   board: { pos: [0, 1.32, 1.25], look: [0, 1.5, -2.4], label: 'Whiteboard' },
   clock: { pos: [1.15, 1.42, -0.15], look: [1.9, 1.85, -2.4], label: 'Wall clock' },
   overview: { pos: [0, 3.2, 2.9], look: [0.3, 0.55, -0.7], label: 'Overview' },
@@ -637,6 +637,7 @@ export class TutoringRoom {
 
   setCalmMode(on) {
     this.life?.setCalmMode(on);
+    this.interact?.setCalmMode(on);
   }
 
   update(dt, reduced, camera = null) {
