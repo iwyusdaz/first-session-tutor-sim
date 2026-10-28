@@ -38,6 +38,19 @@ Each decision with alternatives and rationale. Deviations from plan 07 are marke
 | D20 | Own ports: preview 4187, sub-path server 4198, poster server 4791 | Defaults | Other repos' servers share this machine. |
 | D21 | No decoder plugin and no Draco/KTX2 decoders | Template decoder plugin | The project loads no compressed models or textures. |
 
+## Visual revamp v2.0.0 (plan 09, owner decisions locked 2026-10-28)
+
+| # | Decision | Alternatives | Rationale |
+|---|---|---|---|
+| D22 | Calm mode instead of a frozen scene: ambient life (sun shafts, dust, pendulum + second hand, corridor classmate, character micro-motion) runs everywhere and slows to ~30 % while a decision is on screen; `prefers-reduced-motion` and the in-game toggle still stop all non-essential motion (cue poses apply snapped) | Freeze all motion during tasks (v1 rule) | Owner decision 1. Keeps learning cues the most salient thing on screen while ending the frozen look; reduced motion keeps parity. |
+| D23 | Full-bleed 3D viewport with a compact floating HUD drawer ("Hide panel"/"Show panel" in the header; `html[data-drawer-collapsed]` slides `#session-panel` aside via `src/v2/hud-shell.css`) plus a Plain-font toggle | Keep the fixed 35–50 % side panel | Owner decision 7. The scene is the primary interface; the panel and the full text mode remain for parity. |
+| D24 | **Supersedes D11/D12:** students are animated-movie-style characters (`src/v2/stylized-character.js`, own work) — layered eyes with catchlights, sculpted hair (Jordan short dark hair, Talia bun, Sam short hair, no hood), seated at real desks, with breathing, blinking, gaze, writing, confused/withdrawn poses and lip-flap. MakeHuman still not used | MakeHuman CC0 exports; keep the v1 capsule figures | Owner decision 5 (animated-feature look). The v1 representation rules (R1) carry over unchanged; still no human representation review. |
+| D25 | Six Poly Haven CC0 GLB models (`SchoolDesk_01`, `SchoolChair_01`, `wooden_bookshelf_worn`, `book_encyclopedia_set_01`, `wall_clock`, `potted_plant_02`) placed via `src/v2/model-placer.js` from a content-hashed manifest; everything else stays procedural; GLBs load without decoders (D21 stands) | More models; Blender-authored props | Owner decision 2 (max keyless CC0/CC-BY models). Small download (~5.5 MB of GLB), full attribution. |
+| D26 | In-world interaction via `src/v2/in-world-interaction.js`: glowing floor hotspot rings for the preset views, hover highlight + tooltip on students, click → camera glide to their worksheet close-up, free mouse-drag look and WASD/arrow walking between glides | Panel-button-only navigation | Owner decision 8. Every in-world action keeps its panel-button (keyboard) and text-mode equivalent. |
+| D27 | Visuals only: no new audio; plan §4.7's "clock ticking louder" expressed as a swinging pendulum, a live second hand and the HUD clock | Add audio | Owner decision 9. |
+| D28 | Case typography self-hosted (Sora / Lexend / Patrick Hand, SIL OFL 1.1, subset woff2) in `--font-display/-body/-accent` roles with a Plain-font toggle; Patrick Hand handwriting on the whiteboard, worksheets and posters (redrawn once `document.fonts.ready` resolves) | System fonts; CDN web fonts | Plan §2.4; no third-party requests; the readability rule is kept (Lexend for all body copy). |
+| D29 | Rolling v2.0.0 release: poster re-rendered from the new scene with blank-frame retry, showcase.json re-pinned for the orchestrator | Batch release at the end | Owner decision 6. The builder does not tag. |
+
 ## Not done
 
 - **Trailer:** not recorded (needs a headed GPU capture, which the orchestrator serializes). README has a placeholder.

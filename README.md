@@ -4,7 +4,7 @@
 
 **Play:** https://immersive-learning-showcase.vercel.app/play/first-session-tutor-sim/ *(pending deployment)*
 
-Run a 30-minute small-group math tutoring session with three simulated middle-school students. Read their body language, choose your tutoring moves, practice real wait time, and review a replay that shows how each student's understanding, engagement and confidence changed with your choices.
+Run a 30-minute small-group math tutoring session with three simulated middle-school students in a living 3D classroom — afternoon sun through the blinds, ambient life, and expressive animated-movie-style characters. Read their body language, choose your tutoring moves, practice real wait time, and review a replay that shows how each student's understanding, engagement and confidence changed with your choices. The full session also runs in text mode.
 
 All three students are fictional, constructed for teaching purposes. Bridge Math Tutoring, the program in the story, is fictional.
 
@@ -41,8 +41,9 @@ The session follows the five-part routine (warm-up → review → guided practic
 Full list with alternatives in `DECISIONS.md`.
 
 - **A transparent, authored student model, no AI.** 30 rules in `content/behavior-rules.json`, each with a rationale and a source. It is a simplified teaching model, not a validated psychological model. Reviewers can see exactly why a student reacted.
-- **Body language over facial realism.** Posture, gaze and hand activity carry the cues. Faces stay subtle, with no lip sync, to avoid the uncanny valley (`design/realism-matrix.md`). The students are stylized procedural figures; MakeHuman was not used.
-- **Real-time wait.** After a question the learner must actually wait. A 0.5×–2× scale and a manual-wait option keep it accessible; scoring uses whether they waited, not how fast they react.
+- **Body language over facial realism.** Posture, gaze and hand activity carry the cues. The students are animated-movie-style characters (v2.0.0, own work): layered eyes, sculpted hair, seated at real desks, breathing, blinking, gaze that follows you, and lip-flap when a move lands on them. The v1 representation rules carry over unchanged: gender and skin tone are decorrelated from behavior, and no clothing marks withdrawal (`design/character-design.md`).
+- **Real-time wait.** After a question the learner must actually wait — the room itself calms while you hold the silence (the pendulum swings, the clock's second hand turns). A 0.5×–2× scale and a manual-wait option keep it accessible; scoring uses whether they waited, not how fast they react.
+- **A room you act in (v2.0.0).** The 3D scene fills the viewport with a floating HUD drawer you can hide. Glowing hotspot rings glide the camera to any view; click a student to read their worksheet up close; drag to look and walk with WASD/arrow keys. Ambient life (sun shafts, dust, a classmate at the corridor door) slows to ~30 % during each decision (calm mode) and stops under reduced motion. Every in-world action keeps a panel-button and text-mode equivalent.
 - **Realistic wrong options.** The palette includes common failure modes ("tell the answer", "generic praise"), labeled as not canonical, so the replay has something to teach.
 - **Replay tied to the observation rubric**, so a coach and tutor can discuss a run in the same terms as a real observation.
 

@@ -1,5 +1,17 @@
 # Changelog
 
+## 2.0.0 (visual revamp; rolling release, not tagged by the builder)
+
+The plan 09 revamp: from "a 3D picture next to a text panel" to a living classroom you act inside. Owner decisions for plan 09 are locked in `DECISIONS.md` (D22–D29).
+
+- **Living classroom:** the room is now a full classroom — Poly Haven CC0 desks, chairs, bookshelf, encyclopedia set, wall clock and potted plant; a full window with blinds and a real 3D exterior (trees, playground, sky); posters, radiator, corridor door with a classmate walking past; backpacks at the desk feet. Warm afternoon-sun grade (AgX, `#F3C77A` key light), sun shafts through the blinds, floating dust.
+- **Animated-movie students:** the stylized capsule figures are replaced by expressive animated-feature-style teens (`src/v2/stylized-character.js`) — layered eyes, sculpted hair, seated at desks — with the same authored cue model driving them: writing, hand-up, confused, withdrawn, thinking, gaze at you, lip-flap when a move lands on them. The v1 representation rules carry over unchanged (Jordan she/her dark skin short hair; Talia medium skin bun; Sam lightest skin, nonbinary, short hair, no hood).
+- **Full-bleed 3D + floating HUD:** the scene fills the viewport; the session panel is a compact floating drawer you can hide ("Hide panel"/"Show panel"); Plain-font toggle added; case typography self-hosted (Sora / Lexend / Patrick Hand, SIL OFL 1.1) with Patrick Hand handwriting on the whiteboard, worksheets and posters.
+- **In-world interaction:** glowing hotspot rings for every preset view, hover highlights on students, click-to-glide to worksheet close-ups, free mouse-drag look and WASD/arrow walking — every action still available through the panel buttons and text mode.
+- **Calm mode:** ambient life slows to ~30 % while a decision is on screen and runs fully between moments; reduced motion still stops all non-essential motion; text mode still pauses rendering.
+- **Art bible** at `design/art-bible.md`; attribution extended (fonts + six CC0 models, authors in `public/attribution.json`).
+- **Poster pair re-rendered** from the new scene (`poster-2.0.0.webp`/`.jpg`, 1200×630, ≤ 200 KB) with blank-frame detection and retry; `showcase.json` re-pinned for the showcase refresh.
+
 ## 1.0.0 (unreleased; not tagged yet)
 
 First complete build, then revised against the seven agent reviews (`evaluation/reviews/`; DECISIONS.md revision log R1–R17).

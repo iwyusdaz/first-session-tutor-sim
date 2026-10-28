@@ -1,7 +1,7 @@
 {
   "name": "first-session-tutor-sim",
   "private": true,
-  "version": "1.0.0",
+  "version": "2.0.0",
   "type": "module",
   "description": "A three.js simulation: run your first tutoring session with three simulated students — read cues, choose moves, practice wait time, review the replay",
   "engines": {
@@ -13,7 +13,7 @@
     "preview": "vite preview",
     "test": "vitest run",
     "validate:rules": "node scripts/validate-rules.mjs",
-    "validate:showcase": "node scripts/validate-showcase.mjs 1.0.0",
+    "validate:showcase": "node scripts/validate-showcase.mjs 2.0.0",
     "poster": "node scripts/render-poster.mjs"
   },
   "dependencies": {

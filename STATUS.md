@@ -1,4 +1,26 @@
-# Status: First Session, a Tutor Classroom Simulator (1.0.0, not tagged)
+# Status: First Session, a Tutor Classroom Simulator
+
+## v2.0.0 visual revamp (plan 09; 2026-10-28) — done by the builder, pending orchestrator gates
+
+| Item (plan 09 §8) | Status | Evidence |
+|---|---|---|
+| Art bible (palette, three fonts, lighting mood, asset/ambient/interaction lists) | done | `design/art-bible.md`; grade tokens in `src/v2/cinematic-grade.js` |
+| Living classroom: 6 Poly Haven CC0 models + procedural dressing; no photo backdrops within 30 m (HDRI lighting only, real 3D exterior behind the window) | done | `src/scenes/tutoring-room.js`; `ATTRIBUTION.md` (fonts + models) |
+| ≥ 5 ambient-life systems; calm mode during decision moments; reduced-motion respected; text mode still pauses rendering | done | Sun shafts, dust, pendulum + second hand, corridor classmate, character breathing/blinking/gaze (`AmbientLifeManager`); `App.render()` sets calm; D22 |
+| In-world interaction with keyboard + text-mode equivalents | done | Hotspot rings / student hover-click glide / WASD-drag (`src/v2/in-world-interaction.js`); panel look buttons and full text mode unchanged |
+| Learning cues still the most salient element | done (visual re-check on Low/Medium pending the orchestrator's headed pass) | Calm mode + unchanged cue model; poster + smoke screenshot reviewed |
+| Fonts self-hosted, subset, Plain-font toggle, contrast tokens unchanged | done | `src/styles/case-fonts.css`, `src/v2/hud-shell.css`; v1 WCAG AA tokens kept |
+| Budgets: first interaction ≤ 15 MB; per-file ≤ 20 MB | done (headless re-measure pending) | dist ~9.5 MB incl. GLBs; CI size gate passes |
+| Honesty labels intact | done | `ATTRIBUTION.md`, `public/showcase.json` (fictional students; constructed room) |
+| Poster pair re-rendered from the new scene (≤ 200 KB, blank-frame retry) | done | `public/poster-2.0.0.webp` 61.5 KB / `.jpg` 102.8 KB |
+| Version bump, showcase re-pin, docs | done | `package.json`/`showcase.json` 2.0.0; CHANGELOG; DECISIONS D22–D29; validator `validate:showcase` → 2.0.0 |
+| ≥ 5 revisions, agent reviews, trailer, showcase site refresh, live checks, rollback test | pending (orchestrator) | Plan 09 §3 steps 5–6; builder does not tag |
+
+v1.0.0 status (below) remains valid for the learning design; scene-level items were superseded by the v2 section above.
+
+---
+
+## 1.0.0 (not tagged)
 
 Statuses: **done** (verified by the builder), **done (agent review)** (pending or completed by orchestrator-run agent reviews), **not possible** (reason given), **pending** (scheduled for the orchestrator).
 
