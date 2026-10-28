@@ -132,13 +132,35 @@ export function createAnimatedCharacter(opts = {}) {
     metalness: 0.1,
   });
   const scleraMat = new THREE.MeshStandardMaterial({ color: 0xfaf8f5, roughness: 0.2 });
-  const irisMat = new THREE.MeshStandardMaterial({ color: opts.eyeColor ?? 0x3b2618, roughness: 0.15 });
-  const pupilMat = new THREE.MeshBasicMaterial({ color: 0x09090b });
-  const specMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
   const lipMat = new THREE.MeshStandardMaterial({
     color: new THREE.Color(opts.skinColor ?? 0xd99b78).lerp(new THREE.Color(0xa24848), 0.38),
     roughness: 0.45,
   });
+
+  /**
+   * One draw call per eye: iris + pupil + catchlight merged into a single
+   * vertex-coloured geometry (they only ever move together inside the iris pivot).
+   */
+  function coloredCircleGeometry(radius, segments, color, z, offsetX = 0, offsetY = 0) {
+    const g = new THREE.CircleGeometry(radius, segments).toNonIndexed();
+    g.translate(offsetX, offsetY, z);
+    const count = g.attributes.position.count;
+    const colors = new Float32Array(count * 3);
+    const c = new THREE.Color(color);
+    for (let i = 0; i < count; i++) {
+      colors[i * 3] = c.r;
+      colors[i * 3 + 1] = c.g;
+      colors[i * 3 + 2] = c.b;
+    }
+    g.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+    return g;
+  }
+  const eyeDecalMat = new THREE.MeshBasicMaterial({ vertexColors: true });
+  const buildEyeDecal = (side) => BufferGeometryUtils.mergeGeometries([
+    coloredCircleGeometry(0.0125, 20, opts.eyeColor ?? 0x3b2618, 0.0148),
+    coloredCircleGeometry(0.0068, 16, 0x09090b, 0.0152),
+    coloredCircleGeometry(0.0032, 12, 0xffffff, 0.0156, side * 0.0038, 0.0042),
+  ], false);
 
   // Ground contact shadow
   const shadowTex = getContactShadowTexture();
@@ -292,18 +314,9 @@ export function createAnimatedCharacter(opts = {}) {
     const irisPivot = new THREE.Group();
     eyeGroup.add(irisPivot);
 
-    const iris = new THREE.Mesh(new THREE.CircleGeometry(0.0125, 20), irisMat);
-    iris.position.z = 0.0148;
-    irisPivot.add(iris);
-
-    const pupil = new THREE.Mesh(new THREE.CircleGeometry(0.0068, 16), pupilMat);
-    pupil.position.z = 0.0152;
-    irisPivot.add(pupil);
-
-    // Animated-movie cornea catchlight dot
-    const catchlight = new THREE.Mesh(new THREE.CircleGeometry(0.0032, 12), specMat);
-    catchlight.position.set(side * 0.0038, 0.0042, 0.0156);
-    irisPivot.add(catchlight);
+    // Iris + pupil + catchlight as ONE vertex-coloured mesh (1 draw call, was 3)
+    const decal = new THREE.Mesh(buildEyeDecal(side), eyeDecalMat);
+    irisPivot.add(decal);
 
     // Upper eyelid for blinking & expressions
     const lid = new THREE.Mesh(

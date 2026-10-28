@@ -14,7 +14,94 @@
  * @module v2/cinematic-grade
  */
 import * as THREE from 'three';
+import * as BufferGeometryUtils from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { getContactShadowTexture } from './stylized-character.js';
+
+/**
+ * Merge all descendant meshes of a STATIC scene group into one mesh per material.
+ * Use it on architecture and set dressing (walls, floors, furniture, props) that
+ * never moves — a room built from 100+ small meshes renders in ~10 draw calls
+ * after merging, which is what keeps Medium inside the 300-draw-call budget.
+ * Animated children (characters, particles, rings) must NOT live in this group.
+ * Returns the number of source meshes merged into the group; untouched children
+ * keep their transforms. Containers kept as-is (wrappers, empties, lights) lose
+ * the descendants that were merged — otherwise the merged geometry would draw twice.
+ */
+export function mergeStaticGroup(group) {
+  if (!group) return 0;
+  group.updateMatrixWorld(true);
+  const groupInverse = new THREE.Matrix4().copy(group.matrixWorld).invert();
+  const byMaterial = new Map();
+  const animated = [];
+  const mergedNodes = new Set();
+
+  group.traverse((node) => {
+    if (node === group) return;
+    if (!node.isMesh || node.isSkinnedMesh) { animated.push(node); return; }
+    if (Array.isArray(node.material)) { animated.push(node); return; }
+    const geom = node.geometry;
+    if (!geom || (geom.morphAttributes && Object.keys(geom.morphAttributes).length)) {
+      animated.push(node);
+      return;
+    }
+    if (!byMaterial.has(node.material)) byMaterial.set(node.material, []);
+    byMaterial.get(node.material).push(node);
+  });
+  if (byMaterial.size === 0) return 0;
+
+  const KEEP = ['position', 'normal', 'uv'];
+  let mergedCount = 0;
+  const mergedRoot = new THREE.Group();
+  mergedRoot.name = `${group.name || 'static'}-merged`;
+  for (const [material, nodes] of byMaterial) {
+    const geos = nodes.map((mesh) => {
+      const g = mesh.geometry.index ? mesh.geometry.toNonIndexed() : mesh.geometry.clone();
+      g.applyMatrix4(new THREE.Matrix4().multiplyMatrices(groupInverse, mesh.matrixWorld));
+      for (const name of Object.keys(g.attributes)) {
+        if (!KEEP.includes(name)) g.deleteAttribute(name);
+      }
+      if (!g.attributes.normal) g.computeVertexNormals();
+      return g;
+    });
+    for (const name of [...KEEP]) {
+      if (!geos.every((g) => g.attributes[name])) {
+        for (const g of geos) g.deleteAttribute(name);
+      }
+    }
+    let merged;
+    try {
+      merged = geos.length === 1 ? geos[0] : BufferGeometryUtils.mergeGeometries(geos, false);
+    } catch {
+      animated.push(...nodes);
+      continue;
+    }
+    if (!merged) { animated.push(...nodes); continue; }
+    const mesh = new THREE.Mesh(merged, material);
+    mesh.name = `merged-${material.uuid.slice(0, 8)}`;
+    mesh.castShadow = nodes.some((n) => n.castShadow);
+    mesh.receiveShadow = true;
+    mergedRoot.add(mesh);
+    for (const n of nodes) mergedNodes.add(n);
+    mergedCount += nodes.length;
+  }
+  for (const node of animated) {
+    // Containers kept as-is (prop wrappers, empties, lights) must NOT keep the
+    // descendants we just merged: their geometry already lives in the merged
+    // meshes, so leaving the originals attached would draw everything twice.
+    const drop = [];
+    node.traverse((d) => { if (d !== node && mergedNodes.has(d)) drop.push(d); });
+    for (const d of drop) d.removeFromParent();
+    node.updateMatrixWorld(true);
+    const relative = new THREE.Matrix4().multiplyMatrices(groupInverse, node.matrixWorld);
+    node.matrix.copy(relative);
+    node.matrix.decompose(node.position, node.quaternion, node.scale);
+    node.matrixWorldNeedsUpdate = true;
+    mergedRoot.add(node);
+  }
+  group.clear();
+  group.add(mergedRoot);
+  return mergedCount;
+}
 
 export const CASE_THEMES = {
   'lunar-field-expedition': {

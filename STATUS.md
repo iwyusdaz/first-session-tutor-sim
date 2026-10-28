@@ -11,6 +11,7 @@
 | Learning cues still the most salient element | done (visual re-check on Low/Medium pending the orchestrator's headed pass) | Calm mode + unchanged cue model; poster + smoke screenshot reviewed |
 | Fonts self-hosted, subset, Plain-font toggle, contrast tokens unchanged | done | `src/styles/case-fonts.css`, `src/v2/hud-shell.css`; v1 WCAG AA tokens kept |
 | Budgets: first interaction ≤ 15 MB; per-file ≤ 20 MB | done (headless re-measure pending) | dist ~9.5 MB incl. GLBs; CI size gate passes |
+| Draw-call budget (≤ 300 on Medium) and ≥ 55 fps | in progress — static-room merge applied; headed fps re-measure pending (orchestrator) | 2026-10-28 perf revision (DECISIONS.md P1–P4): headless probe 481 → 383 draw calls after merging all static content into 40 per-material meshes (was 116 source meshes + 11 separately-drawn GLB instances); Medium preset now 0.8 scale / 1536 shadow map, same as hazard-hunt. Residual calls are animated content the merge must not touch — see open items |
 | Honesty labels intact | done | `ATTRIBUTION.md`, `public/showcase.json` (fictional students; constructed room) |
 | Poster pair re-rendered from the new scene (≤ 200 KB, blank-frame retry) | done | `public/poster-2.0.0.webp` 61.5 KB / `.jpg` 102.8 KB |
 | Version bump, showcase re-pin, docs | done | `package.json`/`showcase.json` 2.0.0; CHANGELOG; DECISIONS D22–D29; validator `validate:showcase` → 2.0.0 |
@@ -81,6 +82,7 @@ Statuses: **done** (verified by the builder), **done (agent review)** (pending o
 
 - **No human representation review.** The representation persona in `evaluation/reviews/agent-review-expert-style.md` is simulated; the decorrelation fixes (DECISIONS.md R1) were applied by the builder agent. A human reviewer with lived experience of the identities involved should check the characters before real cohorts use this.
 - **Open review findings (deliberately not applied):** hand-up cue gating by context (expert E-T4), per-domain rubric anchors in the debrief level column (E-T7), 3D clock inside the group framing (R-C7, covered by the HUD instead), watch-beat before reaction text (MP6), cue-vocabulary pre-training (MP7). See DECISIONS.md "Not applied".
+- **Open perf items after the 2026-10-28 static-room merge (DECISIONS.md P1–P4):** the ≤ 300 draw-call budget on Medium needs one more pass over the animated content the merge must not touch — the 4 articulated characters (127 meshes, ~44 shadow casters), the 7 pulsing hotspot rings (21 meshes) and the ~90-call shadow pass; currently 383 headless calls (was 481). Also: the `mergeStaticGroup` double-draw fix (P2) must be propagated to the synced copies of `src/v2/cinematic-grade.js` in the other repos.
 
 - No real tutors or students have used the simulator.
 - The behavior model is a simplified teaching model, not validated against real students.

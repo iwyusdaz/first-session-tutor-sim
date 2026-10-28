@@ -16,8 +16,8 @@ import * as THREE from 'three';
 import { HDRLoader } from 'three/addons/loaders/HDRLoader.js';
 import { AmbientLifeManager } from '../v2/ambient-life.js';
 import { ModelLibrary } from '../v2/model-placer.js';
-import { createAnimatedCharacter } from '../v2/stylized-character.js';
-import { groundProp } from '../v2/cinematic-grade.js';
+import { createAnimatedCharacter, getContactShadowTexture } from '../v2/stylized-character.js';
+import { groundProp, mergeStaticGroup } from '../v2/cinematic-grade.js';
 
 const BASE = import.meta.env.BASE_URL || './';
 /** CC0 Poly Haven PBR sets (1k JPG; names content-hashed by scripts/fetch-assets.mjs). */
@@ -97,13 +97,34 @@ export class TutoringRoom {
     this.gaze = { tutor: new THREE.Vector3(0, 1.25, 1.4), window: new THREE.Vector3(-3.1, 1.6, -0.6) };
     this.windowPos = this.gaze.window;
 
+    // Everything that never moves — architecture, set dressing, and the async
+    // Poly Haven furniture — is built into this one group, then merged into a
+    // single mesh per material (perf revision: the classroom was draw-call bound
+    // at ~480 calls; the merge is what brings Medium back inside the budget).
+    // Characters, hotspot rings, sun shafts/dust and the clock's pendulum/second
+    // hand stay OUT of it (they animate or are repositioned at runtime).
+    this.staticRoom = new THREE.Group();
+    this.staticRoom.name = 'staticRoom';
+    this.scene.add(this.staticRoom);
+
     this._buildRoom();
     this._buildStudents(mixes);
     this._buildDressing();
     this._buildCorridor();
     this._initAmbientLife();
     this._loadEnvironment();
-    this._placeModels();
+    // Merge after the furniture arrives: bake the whole static room down to one
+    // mesh per material. Kept on the room for the perf report / verification.
+    this._placeModels().then(() => {
+      // The placed props each got their own identical contact-shadow material;
+      // pointing them all at one instance lets the merge collapse the 10 discs
+      // into a single transparent draw call.
+      const discMat = new THREE.MeshBasicMaterial({
+        map: getContactShadowTexture(), transparent: true, depthWrite: false, opacity: 0.62,
+      });
+      this.staticRoom.traverse((o) => { if (o.isMesh && o.name === 'v2-contact-shadow') o.material = discMat; });
+      this.staticMergedCount = mergeStaticGroup(this.staticRoom);
+    }).catch(() => { /* on failure the room stays unmerged but renders fine */ });
     // Handwriting textures need the case fonts loaded; redraw once they arrive.
     if (typeof document !== 'undefined' && document.fonts?.ready) {
       document.fonts.ready.then(() => {
@@ -114,12 +135,14 @@ export class TutoringRoom {
     }
   }
 
+  /** Box helper for STATIC architecture/set dressing only — lands in staticRoom
+   * so mergeStaticGroup can collapse it later (never for animated meshes). */
   _box(w, h, d, mat, x, y, z, { shadow = true } = {}) {
     const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat);
     m.position.set(x, y, z);
     m.castShadow = shadow;
     m.receiveShadow = true;
-    this.scene.add(m);
+    this.staticRoom.add(m);
     return m;
   }
 
@@ -138,39 +161,42 @@ export class TutoringRoom {
 
   _buildRoom() {
     const s = this.scene;
+    const g = this.staticRoom; // static architecture + set dressing (merged later)
     // Floor (CC0 laminate at real-world scale: 1.7 m per tile repeat).
     const floor = new THREE.Mesh(new THREE.PlaneGeometry(7, 7), this._pbrMaterial(TEX.floor, 7 / 1.7, 7 / 1.7));
     floor.rotation.x = -Math.PI / 2;
     floor.receiveShadow = true;
-    s.add(floor);
+    g.add(floor);
     // Corridor floor beyond the right wall.
     const corridorFloor = floor.clone();
     corridorFloor.material = floor.material;
     corridorFloor.position.set(3.9, 0, 0);
     corridorFloor.scale.set(0.35, 1, 1);
-    s.add(corridorFloor);
+    g.add(corridorFloor);
 
     // Walls (CC0 painted plaster, cream). The left wall is built around the window
     // opening (z -1.7..0.5, sill 0.95, head 2.35); the right wall has a door opening.
-    const wallMat = () => this._pbrMaterial(TEX.wall, 3.5, 1.5, { color: 0xefe6d8 });
-    this._box(7, 3, 0.1, wallMat(), 0, 1.5, -2.5); // back wall
+    // ONE shared material (was one per wall): shared materials are what lets
+    // mergeStaticGroup collapse all seven walls into a single draw call.
+    const wallMat = this._pbrMaterial(TEX.wall, 3.5, 1.5, { color: 0xefe6d8 });
+    this._box(7, 3, 0.1, wallMat, 0, 1.5, -2.5); // back wall
     // Left wall segments around the window.
-    this._box(0.1, 3, 1.85, wallMat(), -3.2, 1.5, -2.65); // z -3.575..-1.725
-    this._box(0.1, 3, 3.05, wallMat(), -3.2, 1.5, 2.075); // z 0.55..3.6
-    this._box(0.1, 0.95, 2.3, wallMat(), -3.2, 0.475, -0.6); // under sill
-    this._box(0.1, 0.65, 2.3, wallMat(), -3.2, 2.675, -0.6); // above head
+    this._box(0.1, 3, 1.85, wallMat, -3.2, 1.5, -2.65); // z -3.575..-1.725
+    this._box(0.1, 3, 3.05, wallMat, -3.2, 1.5, 2.075); // z 0.55..3.6
+    this._box(0.1, 0.95, 2.3, wallMat, -3.2, 0.475, -0.6); // under sill
+    this._box(0.1, 0.65, 2.3, wallMat, -3.2, 2.675, -0.6); // above head
     // Right wall with a door opening at z -1.6..-0.7 (corridor door).
-    this._box(0.1, 3, 1.9, wallMat(), 3.2, 1.5, -2.55); // z -3.5..-1.6
-    this._box(0.1, 3, 4.2, wallMat(), 3.2, 1.5, 1.4); // z -0.7..3.5
-    this._box(0.1, 0.95, 0.95, wallMat(), 3.2, 0.475, -1.15); // above door head
+    this._box(0.1, 3, 1.9, wallMat, 3.2, 1.5, -2.55); // z -3.5..-1.6
+    this._box(0.1, 3, 4.2, wallMat, 3.2, 1.5, 1.4); // z -0.7..3.5
+    this._box(0.1, 0.95, 0.95, wallMat, 3.2, 0.475, -1.15); // above door head
 
-    // Skirting board.
+    // Skirting board (small trim: casts no shadow).
     const skirtMat = new THREE.MeshStandardMaterial({ color: 0xdcd4c4, roughness: 0.55 });
-    this._box(6.3, 0.1, 0.02, skirtMat, 0, 0.05, -2.44);
-    this._box(0.02, 0.1, 1.75, skirtMat, -3.14, 0.05, -2.6);
-    this._box(0.02, 0.1, 2.95, skirtMat, -3.14, 0.05, 2.05);
-    this._box(0.02, 0.1, 1.8, skirtMat, -3.14, 0.05, -0.6);
-    this._box(0.02, 0.1, 6.9, skirtMat, 3.14, 0.05, 0);
+    this._box(6.3, 0.1, 0.02, skirtMat, 0, 0.05, -2.44, { shadow: false });
+    this._box(0.02, 0.1, 1.75, skirtMat, -3.14, 0.05, -2.6, { shadow: false });
+    this._box(0.02, 0.1, 2.95, skirtMat, -3.14, 0.05, 2.05, { shadow: false });
+    this._box(0.02, 0.1, 1.8, skirtMat, -3.14, 0.05, -0.6, { shadow: false });
+    this._box(0.02, 0.1, 6.9, skirtMat, 3.14, 0.05, 0, { shadow: false });
 
     // --- Window: frame, mullion, glass, blinds; real 3D exterior beyond. ---
     const frameMat = new THREE.MeshStandardMaterial({ color: 0xf5f2ea, roughness: 0.5 });
@@ -184,10 +210,10 @@ export class TutoringRoom {
     }));
     glass.position.set(-3.19, 1.65, -0.6);
     glass.rotation.y = Math.PI / 2;
-    s.add(glass);
-    // Blinds: headrail + tilted slats over the top of the window.
+    g.add(glass);
+    // Blinds: headrail + tilted slats over the top of the window (thin: no shadows).
     const blindMat = new THREE.MeshStandardMaterial({ color: 0xf1ecdf, roughness: 0.75 });
-    this._box(0.09, 0.07, 2.3, blindMat, -3.1, 2.36, -0.6);
+    this._box(0.09, 0.07, 2.3, blindMat, -3.1, 2.36, -0.6, { shadow: false });
     for (let i = 0; i < 6; i++) {
       const slat = this._box(0.02, 0.012, 2.24, blindMat, -3.06, 2.28 - i * 0.075, -0.6, { shadow: false });
       slat.rotation.x = 0.55;
@@ -199,20 +225,20 @@ export class TutoringRoom {
     const lawn = new THREE.Mesh(new THREE.PlaneGeometry(8, 10), new THREE.MeshStandardMaterial({ color: 0x6d9159, roughness: 1 }));
     lawn.rotation.x = -Math.PI / 2;
     lawn.position.set(-7, 0, -0.6);
-    s.add(lawn);
+    g.add(lawn);
     const trunkMat = new THREE.MeshStandardMaterial({ color: 0x6b4a33, roughness: 0.9 });
     const leafMat = new THREE.MeshStandardMaterial({ color: 0x4e7a3d, roughness: 0.95 });
     for (const [tx, tz, h] of [[-4.6, -1.6, 2.6], [-5.4, 0.4, 3.2], [-4.4, 1.6, 2.2], [-6.4, -1.0, 3.6], [-6.2, 1.9, 2.8]]) {
       const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.13, h, 8), trunkMat);
       trunk.position.set(tx, h / 2, tz);
       trunk.castShadow = true;
-      s.add(trunk);
+      g.add(trunk);
       for (const [oy, r] of [[h + 0.15, 0.85], [h + 0.7, 0.6]]) {
         const blob = new THREE.Mesh(new THREE.SphereGeometry(r, 10, 8), leafMat);
         blob.position.set(tx, oy, tz);
         blob.scale.y = 0.85;
         blob.castShadow = true;
-        s.add(blob);
+        g.add(blob);
       }
     }
     // Playground: swing frame + slide, seen through the window.
@@ -242,9 +268,11 @@ export class TutoringRoom {
     }));
     treeline.position.set(-7.6, 1.5, -0.6);
     treeline.rotation.y = Math.PI / 2;
-    s.add(treeline);
+    g.add(treeline);
 
     // --- Whiteboard with the problem of the moment (Patrick Hand handwriting). ---
+    // The board face/clock face/posters only redraw their canvas TEXTURES at runtime
+    // (same material object), so merging never interferes with document.fonts.ready.
     this.boardCanvas = document.createElement('canvas');
     this.boardCanvas.width = 1024; this.boardCanvas.height = 512;
     this.boardTex = new THREE.CanvasTexture(this.boardCanvas);
@@ -254,18 +282,19 @@ export class TutoringRoom {
     this._box(2.34, 0.05, 0.09, trayMat, 0, 0.855, -2.42);
     const board = new THREE.Mesh(new THREE.PlaneGeometry(2.2, 1.05), new THREE.MeshStandardMaterial({ map: this.boardTex, roughness: 0.35 }));
     board.position.set(0, 1.45, -2.4);
-    s.add(board);
+    g.add(board);
     this.setBoard('3x − 5 = 10');
 
     // --- Wall clock: Poly Haven model (async) + readable canvas face + pendulum +
     // a live second hand. The session time stays readable at the clock look. ---
+    // (pendulum + second hand are ANIMATED: they go to the scene, not staticRoom)
     this.clockCanvas = document.createElement('canvas');
     this.clockCanvas.width = 256; this.clockCanvas.height = 256;
     this.clockTex = new THREE.CanvasTexture(this.clockCanvas);
     this.clockTex.colorSpace = THREE.SRGBColorSpace;
     const face = new THREE.Mesh(new THREE.CircleGeometry(0.155, 40), new THREE.MeshStandardMaterial({ map: this.clockTex, roughness: 0.4 }));
     face.position.set(1.9, 1.85, -2.36);
-    s.add(face);
+    g.add(face);
     this.setClock('0:00');
     const pendulum = new THREE.Group();
     pendulum.position.set(1.9, 1.66, -2.33);
@@ -291,7 +320,7 @@ export class TutoringRoom {
       const mesh = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshStandardMaterial({ roughness: 0.85 }));
       mesh.position.set(x, y, z);
       mesh.rotation.y = ry;
-      s.add(mesh);
+      g.add(mesh);
       const rec = {
         canvas, mesh,
         redraw: () => {
@@ -346,7 +375,6 @@ export class TutoringRoom {
   }
 
   _buildCorridor() {
-    const s = this.scene;
     // Corridor beyond the right-wall door (visible through the opening).
     const wallMat = this._pbrMaterial(TEX.wall, 2, 1.5, { color: 0xe7dfd0 });
     this._box(0.08, 2.6, 7, wallMat, 4.4, 1.3, 0);
@@ -362,7 +390,7 @@ export class TutoringRoom {
     door.rotation.y = -1.9; // ajar, hinged at the far edge
     const knob = new THREE.Mesh(new THREE.SphereGeometry(0.03, 10, 8), new THREE.MeshStandardMaterial({ color: 0xb08d57, metalness: 0.7, roughness: 0.35 }));
     knob.position.set(3.36, 1.0, -0.85);
-    s.add(knob);
+    this.staticRoom.add(knob);
   }
 
   _buildStudents(mixes) {
@@ -418,21 +446,23 @@ export class TutoringRoom {
     }
   }
 
-  /** Async dressing: the six Poly Haven CC0 models (desks, chairs, shelf, books, clock, plant). */
+  /** Async dressing: the six Poly Haven CC0 models (desks, chairs, shelf, books, clock, plant).
+   * Placed into staticRoom (never moves) so the post-load merge collapses every
+   * instance sharing a material into one mesh. The constructor merges when this resolves. */
   async _placeModels() {
     // Student desks + chairs (one set per seat), tutor desk at the right rear.
     for (const x of Object.values(SEAT_X)) {
-      await this.models.place(this.scene, 'SchoolDesk_01', { position: [x, 0, DESK_Z], targetHeight: 0.78 });
-      await this.models.place(this.scene, 'SchoolChair_01', { position: [x, 0, SEAT_Z - 0.02], targetHeight: 0.85 });
+      await this.models.place(this.staticRoom, 'SchoolDesk_01', { position: [x, 0, DESK_Z], targetHeight: 0.78 });
+      await this.models.place(this.staticRoom, 'SchoolChair_01', { position: [x, 0, SEAT_Z - 0.02], targetHeight: 0.85 });
     }
-    await this.models.place(this.scene, 'SchoolDesk_01', { position: [2.25, 0, -1.75], rotationY: Math.PI / 2, targetHeight: 0.78 });
-    await this.models.place(this.scene, 'SchoolChair_01', { position: [2.75, 0, -1.75], rotationY: -Math.PI / 2, targetHeight: 0.85 });
+    await this.models.place(this.staticRoom, 'SchoolDesk_01', { position: [2.25, 0, -1.75], rotationY: Math.PI / 2, targetHeight: 0.78 });
+    await this.models.place(this.staticRoom, 'SchoolChair_01', { position: [2.75, 0, -1.75], rotationY: -Math.PI / 2, targetHeight: 0.85 });
     // Bookshelf with the encyclopedia set on top, plant in the window corner.
-    await this.models.place(this.scene, 'wooden_bookshelf_worn', { position: [-1.95, 0, -2.28], targetHeight: 1.85 });
-    await this.models.place(this.scene, 'book_encyclopedia_set_01', { position: [-1.95, 1.84, -2.28], targetHeight: 0.26 });
-    await this.models.place(this.scene, 'potted_plant_02', { position: [-2.72, 0, 1.05], targetHeight: 1.15 });
+    await this.models.place(this.staticRoom, 'wooden_bookshelf_worn', { position: [-1.95, 0, -2.28], targetHeight: 1.85 });
+    await this.models.place(this.staticRoom, 'book_encyclopedia_set_01', { position: [-1.95, 1.84, -2.28], targetHeight: 0.26 });
+    await this.models.place(this.staticRoom, 'potted_plant_02', { position: [-2.72, 0, 1.05], targetHeight: 1.15 });
     // Wall clock model behind the readable canvas face.
-    await this.models.place(this.scene, 'wall_clock', { position: [1.9, 1.66, -2.42], targetHeight: 0.42, contactShadow: false });
+    await this.models.place(this.staticRoom, 'wall_clock', { position: [1.9, 1.66, -2.42], targetHeight: 0.42, contactShadow: false });
   }
 
   /** Procedural dressing that needs no assets: backpacks, bottle, tutor props. */
@@ -442,29 +472,32 @@ export class TutoringRoom {
       { x: 0.36, z: -0.72, color: 0xf2b705 },
       { x: 1.02, z: -0.68, color: 0x2e4a3f },
     ];
+    // One shared flap material (identical colour): shared materials are what lets
+    // mergeStaticGroup collapse all three flaps into one draw call.
+    const flapMat = new THREE.MeshStandardMaterial({ color: 0x2d3340, roughness: 0.75 });
     for (const p of packs) {
       const pack = new THREE.Group();
       const body = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.32, 0.14), new THREE.MeshStandardMaterial({ color: p.color, roughness: 0.8 }));
       body.position.y = 0.16;
-      const flap = new THREE.Mesh(new THREE.BoxGeometry(0.25, 0.1, 0.15), new THREE.MeshStandardMaterial({ color: 0x2d3340, roughness: 0.75 }));
+      const flap = new THREE.Mesh(new THREE.BoxGeometry(0.25, 0.1, 0.15), flapMat);
       flap.position.y = 0.3;
       pack.add(body, flap);
       pack.position.set(p.x, 0, p.z);
       pack.rotation.y = (p.x - 0) * 0.4;
-      pack.traverse((o) => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; } });
-      groundProp(pack, { contactShadow: false });
-      this.scene.add(pack);
+      pack.traverse((o) => { if (o.isMesh) { o.receiveShadow = true; } });
+      // Small clutter casts no real shadow (shadow discipline): the desk/chair
+      // shadows around them read fine without 6 extra shadow-pass casters.
+      groundProp(pack, { contactShadow: false, castShadow: false });
+      this.staticRoom.add(pack);
     }
     // Water bottle by the middle desk.
     const bottle = new THREE.Mesh(new THREE.CylinderGeometry(0.033, 0.035, 0.2, 12), new THREE.MeshStandardMaterial({ color: 0x9fc4dd, roughness: 0.25, transparent: true, opacity: 0.75 }));
     bottle.position.set(-0.28, DESK_TOP + 0.1, DESK_Z - 0.12);
-    bottle.castShadow = true;
-    this.scene.add(bottle);
+    this.staticRoom.add(bottle);
     // Tutor desk props: notebook stack + mug (the tutor's seat is the camera, so keep it light).
     const notebook = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.035, 0.3), new THREE.MeshStandardMaterial({ color: 0x3a6ea5, roughness: 0.7 }));
     notebook.position.set(2.25, DESK_TOP + 0.02, -1.7);
-    notebook.castShadow = true;
-    this.scene.add(notebook);
+    this.staticRoom.add(notebook);
   }
 
   _initAmbientLife() {
