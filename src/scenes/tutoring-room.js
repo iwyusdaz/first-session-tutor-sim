@@ -526,6 +526,9 @@ export class TutoringRoom {
       radiusTop: 0.3, radiusBottom: 1.05, height: 4.4,
       color: 0xffe2a8, opacity: 0.085,
     });
+    // Additive + no depth write is order-independent, so the double-sided
+    // shafts need no back-then-front split (perf P12, same reason as the rings).
+    for (const s of this.life.lightShafts) s.mat.forceSinglePass = true;
     this.life.addParticleVolume({
       center: [-1.9, 1.35, -0.55], extents: [3.0, 2.3, 3.2],
       count: 90, size: 0.042, opacity: 0.4, color: 0xfff0cc,
@@ -563,6 +566,14 @@ export class TutoringRoom {
         cameraTarget: v.look,
         onClick: () => onView(view),
       });
+    }
+    // Transparent DoubleSide materials are drawn by three.js in two passes
+    // (back faces, then front), flipping material.side and setting needsUpdate
+    // twice per object per frame — a program-parameter rebuild and a second
+    // draw call each (perf P12). The rings are flat floor discs only ever seen
+    // from above, so one pass draws the same pixels.
+    for (const r of interact.hotspotRings || []) {
+      if (r.outer?.material) r.outer.material.forceSinglePass = true;
     }
     for (const [id, char] of Object.entries(this.chars)) {
       const v = VIEWS[`${id}-work`];
