@@ -123,6 +123,21 @@ export class TutoringRoom {
         map: getContactShadowTexture(), transparent: true, depthWrite: false, opacity: 0.62,
       });
       this.staticRoom.traverse((o) => { if (o.isMesh && o.name === 'v2-contact-shadow') o.material = discMat; });
+      // The wall clock GLB ships its cover glass as MeshPhysicalMaterial with
+      // transmission 1. Any visible transmissive material makes three.js
+      // re-render every opaque object into a transmission target first (~100
+      // extra draw calls on every preset, Low included; perf P11). A plain
+      // transparent sheen reads the same at this size (the face shows through).
+      this.staticRoom.traverse((o) => {
+        if (!o.isMesh || !(o.material?.transmission > 0)) return;
+        const m = o.material;
+        o.material = new THREE.MeshStandardMaterial({
+          name: `${m.name || 'glass'}-flat`, color: m.color, roughness: 0.1, metalness: 0,
+          transparent: true, opacity: 0.15, depthWrite: false,
+        });
+        o.castShadow = false;
+        m.dispose();
+      });
       this.staticMergedCount = mergeStaticGroup(this.staticRoom);
     }).catch(() => { /* on failure the room stays unmerged but renders fine */ });
     // Handwriting textures need the case fonts loaded; redraw once they arrive.
