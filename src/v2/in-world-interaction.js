@@ -53,6 +53,7 @@ export class InWorldInteractionManager {
     this.hotspotRings = [];
     this.hovered = null;
     this.calmFactor = 1; // set via setCalmMode to quiet ring pulses during focused tasks
+    this.enabled = true; // set via setEnabled while inspection tools own the camera
 
     // Camera navigation state (look target + spherical/free walk)
     this.target = new THREE.Vector3(0, 1.3, 0);
@@ -97,6 +98,7 @@ export class InWorldInteractionManager {
 
     this.canvas.addEventListener('pointerdown', (e) => {
       if (e.button !== 0) return;
+      if (!this.enabled) return;
       if (document.querySelector('dialog[open]')) return;
       this._dragging = true;
       this._downPos = { x: e.clientX, y: e.clientY };
@@ -129,6 +131,7 @@ export class InWorldInteractionManager {
     });
 
     window.addEventListener('keydown', (e) => {
+      if (!this.enabled) return;
       const tag = document.activeElement?.tagName;
       if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
       if (document.querySelector('dialog[open]')) return;
@@ -197,6 +200,24 @@ export class InWorldInteractionManager {
     return entry;
   }
 
+  /**
+   * Enable/disable all in-world interaction (pointer, keys, glide, walk).
+   * While disabled the camera and pointer belong to another system (inspection
+   * tools, cinematics, text mode); hover is cleared so no tooltip lingers.
+   */
+  setEnabled(on) {
+    this.enabled = Boolean(on);
+    if (!this.enabled) {
+      this.keys.clear();
+      this.glide = null;
+      this._dragging = false;
+      this._setHovered(null);
+    } else {
+      // Another system moved the camera while we were off; resume from where it is.
+      this._syncAnglesFromCamera();
+    }
+  }
+
   clearInteractives() {
     this._setHovered(null);
     this.items.clear();
@@ -216,27 +237,26 @@ export class InWorldInteractionManager {
     group.position.set(x, y, z);
 
     const color = opts.color ?? 0x38bdf8;
-    // Outer ring + inner disc merged into ONE mesh (perf revision: 3 → 2 draw
-    // calls per ring). They share one hue but different opacities, so the alpha
-    // difference is baked per vertex as a 4-component colour attribute
-    // (three.js enables vertex alpha when the colour attribute has itemSize 4).
+    // Outer ring + inner disc as ONE mesh (one draw call instead of two). They
+    // share a hue but not an opacity, so alpha is baked per vertex in an RGBA
+    // colour attribute (three.js reads vertex alpha when itemSize is 4).
+    const tint = new THREE.Color(color);
     const withAlpha = (geo, alpha, yPos) => {
       const g = geo.toNonIndexed();
       g.rotateX(-Math.PI / 2);
       g.translate(0, yPos, 0);
       const count = g.attributes.position.count;
-      const colors = new Float32Array(count * 4);
-      const c = new THREE.Color(color);
+      const rgba = new Float32Array(count * 4);
       for (let i = 0; i < count; i++) {
-        colors[i * 3] = c.r;
-        colors[i * 3 + 1] = c.g;
-        colors[i * 3 + 2] = c.b;
-        colors[i * 3 + 3] = alpha;
+        rgba[i * 4] = tint.r;
+        rgba[i * 4 + 1] = tint.g;
+        rgba[i * 4 + 2] = tint.b;
+        rgba[i * 4 + 3] = alpha;
       }
-      g.setAttribute('color', new THREE.BufferAttribute(colors, 4));
+      g.setAttribute('color', new THREE.BufferAttribute(rgba, 4));
       return g;
     };
-    const ring = new THREE.Mesh(
+    const outer = new THREE.Mesh(
       BufferGeometryUtils.mergeGeometries([
         withAlpha(new THREE.RingGeometry(0.28, 0.38, 32), 0.85, 0.02),
         withAlpha(new THREE.CircleGeometry(0.26, 28), 0.22, 0.015),
@@ -249,7 +269,7 @@ export class InWorldInteractionManager {
         depthWrite: false,
       }),
     );
-    group.add(ring);
+    group.add(outer);
 
     // Floating diamond beacon above the ring
     const diamond = new THREE.Mesh(
@@ -265,9 +285,7 @@ export class InWorldInteractionManager {
     group.add(diamond);
 
     (opts.parent || this.scene).add(group);
-    // `ring` is the merged ring+disc mesh (pulses as one — the disc used to hold
-    // still; pulsing both reads slightly better and costs the same).
-    this.hotspotRings.push({ group, ring, diamond, phase: this.hotspotRings.length * 1.1 });
+    this.hotspotRings.push({ group, outer, diamond, phase: this.hotspotRings.length * 1.1 });
 
     this.registerInteractive(group, {
       id: opts.id || `hotspot-${this.hotspotRings.length}`,
@@ -394,6 +412,12 @@ export class InWorldInteractionManager {
   }
 
   _onHoverMove(e) {
+    // While another tool owns the pointer (crater counter, magnifier), no hover
+    // tooltip may promise a click that won't happen.
+    if (!this.enabled) {
+      this._setHovered(null);
+      return;
+    }
     if (!this.canvas || e.target !== this.canvas || this.canvas.style.visibility === 'hidden') {
       this._setHovered(null);
       return;
@@ -428,8 +452,11 @@ export class InWorldInteractionManager {
    * Update camera glides, WASD movement, hotspot ring pulses, and projected bubbles.
    */
   update(dt = 0.016, elapsed = 0) {
-    // 1. Camera glide
-    if (this.glide) {
+    // 1. Camera glide. While disabled another camera mode owns the camera, so
+    // glide/walk stop — but rings and bubbles below still animate and project.
+    if (!this.enabled) {
+      // no camera movement
+    } else if (this.glide) {
       this.glide.elapsed += dt;
       const u = Math.min(1, this.glide.elapsed / this.glide.duration);
       const k = easeInOutCubic(u);
@@ -478,7 +505,7 @@ export class InWorldInteractionManager {
       const pulseScale = this.calmFactor ?? 1;
       for (const r of this.hotspotRings) {
         const s = 1 + Math.sin(elapsed * 2.6 + r.phase) * 0.08 * pulseScale;
-        r.ring.scale.setScalar(s);
+        r.outer.scale.setScalar(s);
         r.diamond.position.y = BEACON_Y + Math.sin(elapsed * 2.6 + r.phase) * 0.04 * pulseScale;
         r.diamond.rotation.y = elapsed * 1.4 * Math.max(0.3, pulseScale) + r.phase;
       }

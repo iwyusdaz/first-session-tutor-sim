@@ -889,8 +889,12 @@ export function createAnimatedCharacter(opts = {}) {
       arms.right.elbow.rotation.x = opts.seated ? -0.72 : -0.22;
     }
 
-    head.rotation.y = THREE.MathUtils.lerp(head.rotation.y, targetYaw, 0.15);
-    head.rotation.x = THREE.MathUtils.lerp(head.rotation.x, targetPitch, 0.15);
+    // Gaze lerp must respect the freeze: an unconditional 0.15-per-frame lerp
+    // kept drifting the head for dozens of frames after reduced motion froze
+    // everything else (arrival-english M-1 residual). Frozen = snap to the pose.
+    const gazeLerp = frozen ? 1 : 0.15;
+    head.rotation.y = THREE.MathUtils.lerp(head.rotation.y, targetYaw, gazeLerp);
+    head.rotation.x = THREE.MathUtils.lerp(head.rotation.x, targetPitch, gazeLerp);
     // Whole-eye gaze on the merged eye pair: pitch rotates around the x axis
     // through both eye centres; yaw translates the pair along x (clamped small,
     // as the original iris gaze was). The head takes the bulk of the target.
