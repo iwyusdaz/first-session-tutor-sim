@@ -4,10 +4,10 @@
  */
 export const PRESETS = {
   low: { label: 'Low (phones, older laptops)', resolutionScale: 0.75, shadowMapSize: 0, drawDistance: 300, propsDensity: 0.6, post: ['tone'], textureMaxSize: 1024, aoEnabled: false },
-  // v2: the living-world scene (GLB props, articulated characters, shadow-casting
-  // extras) is fragment-bound at DPR 2; 0.8 scale + 1536 shadow map hold >= 55 fps
-  // on the M1 while keeping the preset's visual quality (DECISIONS.md).
-  medium: { label: 'Medium (default, integrated GPUs)', resolutionScale: 0.8, shadowMapSize: 1024, drawDistance: 600, propsDensity: 1.0, post: ['tone', 'smaa'], textureMaxSize: 2048, aoEnabled: false },
+  // v2: the living-world classroom is fragment-bound at DPR 2. Medium uses the
+  // renderer's native MSAA instead of an SMAA composer pass (one full-screen pass
+  // fewer), with 0.8 scale and a 1024 shadow map (DECISIONS.md, perf P10).
+  medium: { label: 'Medium (default, integrated GPUs)', resolutionScale: 0.8, shadowMapSize: 1024, drawDistance: 600, propsDensity: 1.0, post: ['tone'], textureMaxSize: 2048, aoEnabled: false },
   high: { label: 'High (discrete GPUs, Apple Pro chips)', resolutionScale: 1.0, shadowMapSize: 2048, drawDistance: 1200, propsDensity: 1.0, post: ['tone', 'smaa', 'ao'], textureMaxSize: 4096, aoEnabled: true },
   ultra: { label: 'Ultra (strong desktops)', resolutionScale: 1.0, shadowMapSize: 4096, drawDistance: 2400, propsDensity: 1.2, post: ['tone', 'smaa', 'ao'], textureMaxSize: 4096, aoEnabled: true },
 };
