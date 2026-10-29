@@ -2,7 +2,7 @@
 
 # First Session: a Tutor Classroom Simulator
 
-**Play:** https://immersive-learning-showcase.vercel.app/play/first-session-tutor-sim/ *(pending deployment)*
+**Play:** https://immersive-learning-showcase.vercel.app/play/first-session-tutor-sim/
 
 Run a 30-minute small-group math tutoring session with three simulated middle-school students in a living 3D classroom — afternoon sun through the blinds, ambient life, and expressive animated-movie-style characters. Read their body language, choose your tutoring moves, practice real wait time, and review a replay that shows how each student's understanding, engagement and confidence changed with your choices. The full session also runs in text mode.
 

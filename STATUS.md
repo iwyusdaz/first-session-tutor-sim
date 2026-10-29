@@ -1,6 +1,6 @@
 # Status: First Session, a Tutor Classroom Simulator
 
-## v2.0.0 visual revamp (plan 09; 2026-10-28) — done by the builder, pending orchestrator gates
+## v2.0.0 visual revamp (plan 09; 2026-10-28, release gates 2026-10-29)
 
 | Item (plan 09 §8) | Status | Evidence |
 |---|---|---|
@@ -11,11 +11,12 @@
 | Learning cues still the most salient element | done (visual re-check on Low/Medium pending the orchestrator's headed pass) | Calm mode + unchanged cue model; poster + smoke screenshot reviewed |
 | Fonts self-hosted, subset, Plain-font toggle, contrast tokens unchanged | done | `src/styles/case-fonts.css`, `src/v2/hud-shell.css`; v1 WCAG AA tokens kept |
 | Budgets: first interaction ≤ 15 MB; per-file ≤ 20 MB | done (headless re-measure pending) | dist ~9.5 MB incl. GLBs; CI size gate passes |
-| Draw-call budget (≤ 300 on Medium) and ≥ 55 fps | in progress — static-room merge applied; headed fps re-measure pending (orchestrator) | 2026-10-28 perf revision (DECISIONS.md P1–P4): headless probe 481 → 383 draw calls after merging all static content into 40 per-material meshes (was 116 source meshes + 11 separately-drawn GLB instances); Medium preset now 0.8 scale / 1536 shadow map, same as hazard-hunt. Residual calls are animated content the merge must not touch — see open items |
+| Draw-call budget (≤ 300 on Medium) and ≥ 55 fps | done — headed Apple M1, 2026-10-29, after P11/P12 (`evaluation/results/perf-2026-10-29.json`, staged `startRun('quiet')`): Medium 60.1 fps, 186 draw calls; Low 60.1 fps / 111; High and Ultra 60 fps; menu interactive 0.35 s; 11.9 MB before first interaction. "Is it alive": 16,851 pixels differ between headed frames 5 s apart. Earlier history: | 2026-10-28 perf revision (DECISIONS.md P1–P4): headless probe 481 → 383 draw calls after merging all static content into 40 per-material meshes (was 116 source meshes + 11 separately-drawn GLB instances); Medium preset now 0.8 scale / 1536 shadow map, same as hazard-hunt. Residual calls are animated content the merge must not touch — see open items |
 | Honesty labels intact | done | `ATTRIBUTION.md`, `public/showcase.json` (fictional students; constructed room) |
 | Poster pair re-rendered from the new scene (≤ 200 KB, blank-frame retry) | done | `public/poster-2.0.0.webp` 61.5 KB / `.jpg` 102.8 KB |
 | Version bump, showcase re-pin, docs | done | `package.json`/`showcase.json` 2.0.0; CHANGELOG; DECISIONS D22–D29; validator `validate:showcase` → 2.0.0 |
-| ≥ 5 revisions, agent reviews, trailer, showcase site refresh, live checks, rollback test | pending (orchestrator) | Plan 09 §3 steps 5–6; builder does not tag |
+| ≥ 5 revisions, agent reviews, trailer | done | Four v2 agent reviews (`evaluation/reviews/agent-review-v2-*.md`). Review fixes in commit c17e3cb: spline movers placed on their path, calm-scaled ring pulses, Sam's view cleared of the drawer, Talia's hair JSON matches the render, tooltip font. Plus perf revisions P1–P12. Trailer re-recorded from v2.0.0 (56 s, 16.4 MB, captioned + VTT) |
+| Tag v2.0.0 + showcase pin, live checks | done by the orchestrator (see CHANGELOG) | |
 
 v1.0.0 status (below) remains valid for the learning design; scene-level items were superseded by the v2 section above.
 

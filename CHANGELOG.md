@@ -1,6 +1,8 @@
 # Changelog
 
-## 2.0.0 (visual revamp; rolling release, not tagged by the builder)
+## 2.0.0 (2026-10-29, visual revamp)
+
+Release gate: v2 agent-review fixes (c17e3cb) and perf revisions P1–P12. P11 removed a hidden full-scene transmission pass caused by the wall clock's glass; P12 made the hotspot rings and sun shafts single-pass. Headed Apple M1: 60 fps on every preset, Medium 186 draw calls, 11.9 MB before first interaction. Trailer re-recorded from the living classroom.
 
 The plan 09 revamp: from "a 3D picture next to a text panel" to a living classroom you act inside. Owner decisions for plan 09 are locked in `DECISIONS.md` (D22–D29).
 
